@@ -1,0 +1,8 @@
+header {
+    background-color: chartreuse;
+    color: black;
+}
+
+header a:hover {
+    font-weight: bold;
+}

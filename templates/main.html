@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carreras</title>
+</head>
+<body>
+    <nav>
+        <a href="/"><img src="images/logo.png" alt="logo"/></a>
+        <a href="/">Pilotos</a>
+        <a href="/calendar">Calendario</a>
+        <a href="/teams">Equipos</a>
+    </nav>
+    <div id="main-container">
+      <div id="table-container">
+        <table id="driver-table">
+          <tr>
+            <th>Piloto</th>
+            <th>Puntos</th>
+            <th>Actualizar</th>
+          </tr>
+          {% for d in drivers %}
+          <tr>
+            <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
+            <td>
+              <form id="{{ d.id }}-form" method="post" onsubmit="update({{ d.id }})">
+                <input id="{{ d.id }}-score" type="number" value="{{ d.score }}">
+              </form>
+            </td>
+            <th><button form="{{ d.id }}-form" type="submit">Actualizar</button></th>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      <div id="driver-form">
+        <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
+      </div>
+    </div>
+  <script>
+    function insertDriverForm() {
+      const contenedor = document.getElementById("driver-form");
+      const formulario = document.createElement("form");
+      const nombreInput = document.createElement("input");
+      const puntosInput = document.createElement("input");
+      const nombreLabel = document.createElement("label");
+      const puntosLabel = document.createElement("label");
+      const boton = document.createElement("input");
+
+      document.getElementById("insert-driver-button").style.display = "none";
+
+      nombreLabel.for = "name-input";
+      nombreLabel.innerText ="Nombre del piloto: ";
+      puntosLabel.for = "score-input";
+      puntosLabel.innerText ="Puntos: ";
+
+      nombreInput.type = "text";
+      nombreInput.id = nombreInput.name = "name-input"
+      puntosInput.type = "number";
+      puntosInput.id = nombreInput.name = "score-input";
+
+      boton.type = "submit";
+      boton.innerText = "Insertar";
+
+      formulario.id = "insert-driver-form";
+      formulario.onsubmit = "insertDriver()";
+      formulario.action = "/";
+      formulario.method = "post";
+
+      formulario.appendChild(nombreLabel);
+      formulario.appendChild(nombreInput);
+      formulario.appendChild(puntosLabel);
+      formulario.appendChild(puntosInput);
+      formulario.appendChild(boton);
+      contenedor.appendChild(formulario);
+    }
+
+    function insertDriver() {
+      const nombre = document.getElementById("name-input").value;
+      let puntos = document.getElementById("score-input").value;
+      const tabla = document.getElementById("driver-table");
+      const fila = document.createElement("tr");
+
+      if(nombre === "") {
+        alert("El nombre no puede estar vacio");
+        return false;
+      } else if (!/^([a-zA-Z]+|[A-Z].)[a-zA-Z]+$/.test(nombre.trim())) {
+        alert("Formato de nombre incorrecto. Utiliza caracteres alfabeticos.")
+      }
+      if(puntos === "") {
+        puntos = 0;
+      }
+
+      let formData = new FormData();
+      formData.append("name", nombre.value);
+      formData.append("score", puntos.value);
+      formData.append("form", "insert");
+
+      let request = new XMLHttpRequest();
+      request.open("POST", "/");
+      request.send(formData);
+
+      fila.innerHTML =
+              '<td><p id="' + nombre.trim() + '-id">' + nombre + '</p></td>\
+               <td>\
+                <form class="' + nombre.trim() + '-form" method="post" onsubmit="update(' + nombre.trim() + ')">\
+                  <input id="' + nombre.trim() + '-score" type="number" value="' + puntos + '">\
+                </form>\
+               </td>\
+               <th><button form="' + nombre.trim() + '-form" type="submit">Actualizar</button></th>'
+      ;
+      tabla.appendChild(fila);
+
+      sortTable();
+
+      alert("Piloto insertado/a correctamente!");
+    }
+
+    function update(id) {
+      const puntos =  document.forms[id + "-id"][id + "-score"];
+      const nombre = document.getElementById(id + "-id");
+
+      let formData = new FormData();
+      formData.append("name", nombre.value);
+      formData.append("score", puntos.value);
+      formData.append("form", "modify");
+
+      let request = new XMLHttpRequest();
+      request.open("POST", "/");
+      request.send(formData);
+
+      sortTable();
+
+      alert("Piloto actualizado/a correctamente!");
+    }
+
+    function sortTable() {
+      let table, rows, switching, i, x, y, shouldSwitch;
+      table = document.getElementById("driver-table");
+      switching = true;
+      // Make a loop that will continue until no switching has been done
+      while (switching) {
+        // start by saying: no switching is done
+        switching = false;
+        rows = table.rows;
+        // Loop through all table rows (except the first, which contains table headers)
+        for (i = 1; i < (rows.length - 1); i++) {
+          // start by saying there should be no switching:
+          shouldSwitch = false;
+          // Get the two elements you want to compare, one from current row and one from the next
+          x = parseInt(rows[i].getElementsByTagName("TD")[1].getFirstElementChild().getFirstElementChild().value, 10);
+          y = parseInt(rows[i + 1].getElementsByTagName("TD")[1].getFirstElementChild().getFirstElementChild().value, 10);
+          //check if the two rows should switch place
+          if (x < y) {
+            //if so, mark as a switch and break the loop
+            shouldSwitch = true;
+            break;
+          }
+        }
+        if (shouldSwitch) {
+          // If a switch has been marked, make the switch and mark that a switch has been done
+          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+          switching = true;
+        }
+      }
+    }
+  </script>
+</body>
+</html>
