@@ -6,3 +6,5 @@
 /dataSources.local.xml
 # Editor-based HTTP Client requests
 /httpRequests/
+# Ignore everything outside handlers, static, templates and root files
+/.idea
