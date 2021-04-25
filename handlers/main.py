@@ -26,6 +26,7 @@ class MainHandler(webapp2.RequestHandler):
 
     def post(self):
         post_type = self.request.get('form', 'ERROR')
+        # Se inserta un nuevo piloto
         if post_type == "insert":
             nombre = self.request.get('name', 'ERROR')
             id_piloto = self.request.get('id', 'ERROR')
@@ -33,6 +34,7 @@ class MainHandler(webapp2.RequestHandler):
             with open('data.json', 'a') as f:
                 data = json.load(f)
                 data["drivers"].append({"id": id_piloto, "name": nombre, "score": puntos})
+        #
         elif post_type == "modify":
             id_piloto = self.request.get('id', 'ERROR')
             puntos = self.request.get('score', 'ERROR')

@@ -152,7 +152,7 @@
 
       fila.innerHTML =
               '<td><p id="' + numero + '-id">' + nombre + '</p></td>\
-               <td><form class="' + numero + '-form" method="post" onsubmit="update(' + numero + ')"><input id="' + numero + '-score" type="number" value="' + puntos + '">\</form>\</td>\
+               <td><form id="' + numero + '-form"  class="update-driver-form" method="post" onsubmit="update(' + numero + ')"><input id="score" type="number" value="' + puntos + '">\</form>\</td>\
                <td><button form="' + numero + '-form" class="update-button" type="submit">Actualizar</button></td>'
       ;
       tabla.appendChild(fila);
@@ -187,30 +187,28 @@
       let table, rows, switching, i, x, y, shouldSwitch;
       table = document.getElementById("driver-table");
       switching = true;
-      // Make a loop that will continue until no switching has been done
+      // Se recorre el bucle hasta que todos los elementos esten ordenados
       while (switching) {
-        // start by saying: no switching is done
         switching = false;
         rows = table.rows;
-        // Loop through all table rows (except the first, which contains table headers)
+        // Se deben recorrer todas las filas salvo la primera, que es la cabecera
         for (i = 1; i < (rows.length - 1); i++) {
           // start by saying there should be no switching:
           shouldSwitch = false;
-          // Get the two elements you want to compare, one from current row and one from the next
+          // Se compara la puntuacion de una fila con la de la siguiente fila
           let xchildren = rows[i].getElementsByTagName("TD")[1].childNodes;
-          console.log(xchildren);
           let ychildren = rows[i + 1].getElementsByTagName("TD")[1].childNodes;
           let x = parseInt(xchildren[0]["score"].value, 10);
           let y = parseInt(ychildren[0]["score"].value, 10);
-          //check if the two rows should switch place
+          // Si la segunda es mayor que la primera, deben intercambiarse
           if (x < y) {
-            //if so, mark as a switch and break the loop
+            // Rompemos el bucle para intercambiarlos
             shouldSwitch = true;
             break;
           }
         }
         if (shouldSwitch) {
-          // If a switch has been marked, make the switch and mark that a switch has been done
+          // Notificamos que se ha realizado el cambio
           rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
           switching = true;
         }
