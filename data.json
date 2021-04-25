@@ -1,141 +1,131 @@
 {
-  "sports" : [
-    {
-      "name": "Formula 1",
-      "category": "cars",
-      "drivers": [
-        {
-          "id": 44,
-          "name": "L. Hamilton",
-          "score": 44
-        },
-        {
-          "id": 33,
-          "name": "M. Verstappen",
-          "score": 43
-        },
-        {
-          "id": 4,
-          "name": "L. Norris",
-          "score": 27
-        },
-        {
-          "id": 16,
-          "name": "C. Leclerc",
-          "score": 20
-        },
-        {
-          "id": 77,
-          "name": "V. Bottas",
-          "score": 16
-        },
-        {
-          "id": 55,
-          "name": "C. Sainz",
-          "score": 14
-        },
-        {
-          "id": 3,
-          "name": "D. Ricciardo",
-          "score": 14
-        },
-        {
-          "id": 11,
-          "name": "S. Perez",
-          "score": 10
-        },
-        {
-          "id": 10,
-          "name": "P. Gasly",
-          "score": 6
-        },
-        {
-          "id": 18,
-          "name": "L. Stroll",
-          "score": 5
-        },
-        {
-          "id": 22,
-          "name": "Y. Tsunoda",
-          "score": 2
-        },
-        {
-          "id": 31,
-          "name": "E. Ocon",
-          "score": 2
-        }
-      ],
-      "teams": [
-        {
-          "name": "Mercedes",
-          "drivers": [44, 77]
-        },
-        {
-          "name": "Red Bull Racing",
-          "drivers": [33, 11]
-        },
-        {
-          "name": "Ferrari",
-          "drivers": [16, 55]
-        },
-        {
-          "name": "McLaren",
-          "drivers": [4, 3]
-        },
-        {
-          "name": "AlphaTauri",
-          "drivers": [10, 22]
-        },
-        {
-          "name": "Aston Martin",
-          "drivers": [18]
-        },
-        {
-          "name": "Alpine",
-          "drivers": [31]
-        }
-      ]
-      "calendar": [
-        {
-          "name": "Gulf Air Bahrain GP",
-          "country": "Bahrain",
-          "date": "2021-03-28"
-        },
-        {
-          "name": "Emilia Romagna GP",
-          "country": "Italy",
-          "date": "2021-04-16"
-        },
-        {
-          "name": "Aramco GP",
-          "country": "Spain",
-          "date": "2021-05-09"
-        },
-        {
-          "name": "Monaco GP",
-          "country": "Monaco",
-          "date": "2021-05-23"
-        },
-        {
-          "name": "Azerbaijan GP",
-          "country": "Azerbaijan",
-          "date": "2021-06-06"
-        },
-        {
-          "name": "Heineken GP",
-          "country": "Canada",
-          "date": "2021-06-13"
-        },
-        {
-          "name": "Emirates GP",
-          "country": "France",
-          "date": "2021-06-27"
-        }
-      ]
+    "drivers": [
+      {
+        "id": 44,
+        "name": "L. Hamilton",
+        "score": 44
+      },
+      {
+        "id": 33,
+        "name": "M. Verstappen",
+        "score": 43
     },
-    {
-      "name": "Moto GP",
-      "category": "motorcicles"
-    }
-  ]
+      {
+        "id": 4,
+        "name": "L. Norris",
+        "score": 27
+      },
+      {
+        "id": 16,
+        "name": "C. Leclerc",
+        "score": 20
+      },
+      {
+        "id": 77,
+        "name": "V. Bottas",
+        "score": 16
+      },
+      {
+        "id": 55,
+        "name": "C. Sainz",
+        "score": 14
+      },
+      {
+        "id": 3,
+        "name": "D. Ricciardo",
+        "score": 14
+      },
+      {
+        "id": 11,
+        "name": "S. Perez",
+        "score": 10
+      },
+      {
+        "id": 10,
+        "name": "P. Gasly",
+        "score": 6
+      },
+      {
+        "id": 18,
+        "name": "L. Stroll",
+        "score": 5
+      },
+      {
+        "id": 22,
+        "name": "Y. Tsunoda",
+        "score": 2
+      },
+      {
+        "id": 31,
+        "name": "E. Ocon",
+        "score": 2
+      }
+    ],
+    "teams": [
+      {
+        "name": "Mercedes",
+        "drivers": [44, 77]
+      },
+      {
+        "name": "Red Bull Racing",
+        "drivers": [33, 11]
+      },
+      {
+        "name": "Ferrari",
+        "drivers": [16, 55]
+      },
+      {
+        "name": "McLaren",
+        "drivers": [4, 3]
+      },
+      {
+        "name": "AlphaTauri",
+        "drivers": [10, 22]
+      },
+      {
+        "name": "Aston Martin",
+        "drivers": [18]
+      },
+      {
+        "name": "Alpine",
+        "drivers": [31]
+      }
+    ],
+    "calendar": [
+      {
+        "name": "Gulf Air Bahrain GP",
+        "country": "Bahrain",
+        "date": "2021-03-28"
+      },
+      {
+        "name": "Emilia Romagna GP",
+        "country": "Italy",
+        "date": "2021-04-16"
+      },
+      {
+        "name": "Aramco GP",
+        "country": "Spain",
+        "date": "2021-05-09"
+      },
+      {
+        "name": "Monaco GP",
+        "country": "Monaco",
+        "date": "2021-05-23"
+      },
+      {
+        "name": "Azerbaijan GP",
+        "country": "Azerbaijan",
+        "date": "2021-06-06"
+      },
+      {
+        "name": "Heineken GP",
+        "country": "Canada",
+        "date": "2021-06-13"
+      },
+      {
+        "name": "Emirates GP",
+        "country": "France",
+        "date": "2021-06-27"
+      }
+    ]
 }

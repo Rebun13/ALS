@@ -3,10 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <title>Carreras</title>
+    <style>
+        nav {
+            height: 40px;
+            text-align: left;
+            background: chartreuse;
+            color: black;
+            font-size: 20px;
+            padding-left: 50px;
+            padding-right: 50px;
+            font-family: Arial,serif;
+        }
+        body {
+            background: dimgrey;
+            color: honeydew;
+            font-family: Roboto,sans-serif;
+        }
+        nav a {
+            text-decoration: none;
+            color: dimgrey;
+            padding: 20px;
+        }
+        nav a:hover {
+            color: black;
+        }
+        #main-container {
+            width: 80%;
+            margin: auto;
+        }
+        #header-logo {
+            height: 15px;
+            width: 15px;
+        }
+        .update-button {
+            background: chartreuse;
+            padding: 8px;
+            border-radius: 6px;
+            border-style: none;
+        }
+
+    </style>
 </head>
 <body>
     <nav>
-        <a href="/"><img src="images/logo.png" alt="logo"/></a>
+        <a href="/"><img src="images/logo.png" id="header-logo" alt="logo"/></a>
         <a href="/">Pilotos</a>
         <a href="/calendar">Calendario</a>
         <a href="/teams">Equipos</a>
@@ -22,12 +62,8 @@
           {% for d in drivers %}
           <tr>
             <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
-            <td>
-              <form id="{{ d.id }}-form" method="post" onsubmit="update({{ d.id }})">
-                <input id="{{ d.id }}-score" type="number" value="{{ d.score }}">
-              </form>
-            </td>
-            <th><button form="{{ d.id }}-form" type="submit">Actualizar</button></th>
+            <td><form id="{{ d.id }}-form" class="update-driver-form" method="post" onsubmit="update({{ d.id }})"><input id="score" type="number" value="{{ d.score }}"></form></td>
+            <th><button form="{{ d.id }}-form" class="update-button" type="submit">Actualizar</button></th>
           </tr>
           {% endfor %}
         </table>
@@ -46,7 +82,7 @@
       const nombreLabel = document.createElement("label");
       const numeroLabel = document.createElement("label");
       const puntosLabel = document.createElement("label");
-      const boton = document.createElement("input");
+      const boton = document.createElement("button");
 
       document.getElementById("insert-driver-button").style.display = "none";
 
@@ -64,13 +100,14 @@
       puntosInput.type = "number";
       puntosInput.id = nombreInput.name = "score-input";
 
-      boton.type = "submit";
+      boton.type = "button";
       boton.innerText = "Insertar";
+      boton.onclick = function() {insertDriver()};
 
       formulario.id = "insert-driver-form";
-      formulario.onsubmit = "insertDriver()";
-      formulario.action = "/";
-      formulario.method = "post";
+      //formulario.onsubmit = "insertDriver()";
+      //formulario.action = "/";
+      //formulario.method = "post";
 
       formulario.appendChild(nombreLabel);
       formulario.appendChild(nombreInput);
@@ -92,7 +129,7 @@
       if(nombre === "") {
         alert("El nombre no puede estar vacio");
         return false;
-      } else if (!/^([a-zA-Z]+|[A-Z].)[a-zA-Z]+$/.test(nombre.trim())) {
+      } else if (!/^[A-Z]\. [a-zA-Z]+$/.test(nombre)) {
         alert("Formato de nombre incorrecto. Utiliza caracteres alfabéticos.");
         return false;
       }
@@ -113,32 +150,27 @@
       formData.append("score", puntos);
       formData.append("form", "insert");
 
-      let request = new XMLHttpRequest();
-      request.open("POST", "/");
-      request.send(formData);
-
       fila.innerHTML =
-              '<td><p id="' + nombre.trim() + '-id">' + nombre + '</p></td>\
-               <td>\
-                <form class="' + nombre.trim() + '-form" method="post" onsubmit="update(' + nombre.trim() + ')">\
-                  <input id="' + nombre.trim() + '-score" type="number" value="' + puntos + '">\
-                </form>\
-               </td>\
-               <th><button form="' + nombre.trim() + '-form" type="submit">Actualizar</button></th>'
+              '<td><p id="' + numero + '-id">' + nombre + '</p></td>\
+               <td><form class="' + numero + '-form" method="post" onsubmit="update(' + numero + ')"><input id="' + numero + '-score" type="number" value="' + puntos + '">\</form>\</td>\
+               <td><button form="' + numero + '-form" class="update-button" type="submit">Actualizar</button></td>'
       ;
       tabla.appendChild(fila);
 
       sortTable();
 
       alert("Piloto insertado/a correctamente!");
+
+      let request = new XMLHttpRequest();
+      request.open("POST", "/", true);
+      request.send(formData);
     }
 
     function update(id) {
-      const puntos =  document.forms[id + "-id"][id + "-score"];
-      const nombre = document.getElementById(id + "-id");
+      const puntos =  document.forms[id + "-id"]["score"];
 
       let formData = new FormData();
-      formData.append("name", nombre.value);
+      formData.append("is", id);
       formData.append("score", puntos.value);
       formData.append("form", "modify");
 
@@ -165,8 +197,11 @@
           // start by saying there should be no switching:
           shouldSwitch = false;
           // Get the two elements you want to compare, one from current row and one from the next
-          x = parseInt(rows[i].getElementsByTagName("TD")[1].getFirstElementChild().getFirstElementChild().value, 10);
-          y = parseInt(rows[i + 1].getElementsByTagName("TD")[1].getFirstElementChild().getFirstElementChild().value, 10);
+          let xchildren = rows[i].getElementsByTagName("TD")[1].childNodes;
+          console.log(xchildren);
+          let ychildren = rows[i + 1].getElementsByTagName("TD")[1].childNodes;
+          let x = parseInt(xchildren[0]["score"].value, 10);
+          let y = parseInt(ychildren[0]["score"].value, 10);
           //check if the two rows should switch place
           if (x < y) {
             //if so, mark as a switch and break the loop
