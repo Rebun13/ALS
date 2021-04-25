@@ -26,27 +26,31 @@ class MainHandler(webapp2.RequestHandler):
 
     def post(self):
         post_type = self.request.get('form', 'ERROR')
-        # Se inserta un nuevo piloto
-        if post_type == "insert":
-            nombre = self.request.get('name', 'ERROR')
-            id_piloto = self.request.get('id', 'ERROR')
-            puntos = self.request.get('score', 'ERROR')
+        nombre = self.request.get('name', 'ERROR')
+        id_piloto = self.request.get('id', 'ERROR')
+        puntos = self.request.get('score', 'ERROR')
+
+        if post_type == "insert" and id_piloto:
+            id_piloto = int(id_piloto)
+            puntos = int(puntos)
             with open('data.json', 'a') as f:
                 data = json.load(f)
                 data["drivers"].append({"id": id_piloto, "name": nombre, "score": puntos})
-        #
-        elif post_type == "modify":
-            id_piloto = self.request.get('id', 'ERROR')
-            puntos = self.request.get('score', 'ERROR')
+
+        elif post_type == "modify" and id_piloto:
+            id_piloto = int(id_piloto)
+            puntos = int(puntos)
             with open('data.json', 'r') as f:
                 data = json.load(f)
-                for d in data:
+                drivers = list(data["drivers"])
+                for d in drivers:
                     if d["id"] == id_piloto:
                         driver = d
                         break
             driver["score"] = puntos
             with open('data.json', 'w') as f:
                 json.dump(driver, f)
+
         else:
             pass
 

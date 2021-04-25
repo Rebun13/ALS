@@ -46,7 +46,7 @@
 </head>
 <body>
     <nav>
-        <a href="/"><img src="images/logo.png" id="header-logo" alt="logo"/></a>
+        <a href="/"><img src="./static/logo.png" id="header-logo" alt="logo"/></a>
         <a href="/">Pilotos</a>
         <a href="/calendar">Calendario</a>
         <a href="/teams">Equipos</a>
@@ -62,15 +62,14 @@
           {% for d in drivers %}
           <tr>
             <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
-            <td><form id="{{ d.id }}-form" class="update-driver-form" method="post" onsubmit="update({{ d.id }})"><input id="score" type="number" value="{{ d.score }}"></form></td>
-            <th><button form="{{ d.id }}-form" class="update-button" type="submit">Actualizar</button></th>
+            <td><form id="{{ d.id }}-form" class="update-driver-form"><input id="score" type="number" value="{{ d.score }}"></form></td>
+            <th><button form="{{ d.id }}-form" class="update-button" type="button" onclick="update({{ d.id }})">Actualizar</button></th>
           </tr>
           {% endfor %}
         </table>
       </div>
-      <div id="driver-form">
-        <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
-      </div>
+      <div id="driver-form"></div>
+      <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
     </div>
   <script>
     function insertDriverForm() {
@@ -89,16 +88,19 @@
       nombreLabel.for = "name-input";
       nombreLabel.innerText ="Nombre del piloto: ";
       numeroLabel.for = "number-input";
-      numeroLabel.innerText = "Dorsal";
+      numeroLabel.innerText = "Dorsal: ";
       puntosLabel.for = "score-input";
       puntosLabel.innerText ="Puntos: ";
 
       nombreInput.type = "text";
       nombreInput.id = nombreInput.name = "name-input";
+      nombreInput.style.display = "block";
       numeroInput.type = "text";
       numeroInput.id = numeroInput.name = "number-input";
+      numeroInput.style.display = "block";
       puntosInput.type = "number";
       puntosInput.id = nombreInput.name = "score-input";
+      puntosInput.style.display = "block";
 
       boton.type = "button";
       boton.innerText = "Insertar";
@@ -159,6 +161,9 @@
 
       sortTable();
 
+      document.getElementById("driver-form").innerHTML = "";
+      document.getElementById("insert-driver-button").style.display = "inline-block";
+
       alert("Piloto insertado/a correctamente!");
 
       let request = new XMLHttpRequest();
@@ -167,11 +172,12 @@
     }
 
     function update(id) {
-      const puntos =  document.forms[id + "-id"]["score"];
+      const puntos =  document.getElementById(id + "-form")["score"].value;
+      console.log(puntos);
 
       let formData = new FormData();
-      formData.append("is", id);
-      formData.append("score", puntos.value);
+      formData.append("id", id);
+      formData.append("score", puntos);
       formData.append("form", "modify");
 
       let request = new XMLHttpRequest();
