@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carreras</title>
+    <style>
+        nav {
+            height: 50px;
+            text-align: center;
+            background: dimgray;
+            color: black;
+            font-size: 20px;
+            padding-left: 50px;
+            padding-right: 50px;
+            font-family: Arial,serif;
+            border-bottom: chartreuse 1px solid;
+        }
+        body {
+            background: dimgrey;
+            color: honeydew;
+            font-family: Roboto,sans-serif;
+        }
+        nav a {
+            text-decoration: none;
+            color: honeydew;
+            padding: 20px;
+        }
+        nav a:hover {
+            color: chartreuse;
+        }
+        #nav-container {
+            width: 60%;
+        }
+        #main-container {
+            width: 60%;
+            margin: auto;
+        }
+        table {
+            margin: auto;
+        }
+
+    </style>
+</head>
+<body>
+<!-- TODO: Si insertas un piloto y a continuacion lo actualizas, desaparece D: -->
+    <nav>
+        <div id="nav-container">
+            <!-- <a href="/"><img src="./static/logo.png" id="header-logo" alt="logo"/></a> -->
+            <a href="/">Pilotos</a>
+            <a href="/calendar">Calendario</a>
+            <a href="/teams">Equipos</a>
+        </div>
+    </nav>
+    <div id="main-container">
+      <h3>Equipos y pilotos</h3>
+      <div id="main-table-container">
+        <table id="teams-table">
+          <tr>
+            <th>Equipo</th>
+            <th>Pilotos</th>
+            <th></th>
+            <th></th>
+          </tr>
+          {% for key, value in teams %}
+          <tr>
+              <!-- {{ key }} -->
+            <th>{{ key }}</th>
+            {% if value|length == 0 %}
+            <th></th>
+            <th></th>
+            {% elif value|length == 1 %}
+            <th>{{ value[0] }}</th>
+            <th></th>
+            {% else %}
+            <th>{{ value[0] }}</th>
+            <th>{{ value[1] }}</th>
+            {% endif %}
+            <th></th>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+      {% if freelance|length > 0 %}
+      <div id="freelance-drivers-container">
+          <h3>Pilotos sin equipo</h3>
+        <ol id="freelance-list">
+            {% for d in drivers %}
+            <li id="{{ d.id }}">{{ d.name }}</li>
+            {% endfor %}
+        </ol>
+      </div>
+      {% endif %}
+    </div>
+
+</body>
+</html>
