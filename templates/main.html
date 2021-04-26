@@ -5,14 +5,15 @@
     <title>Carreras</title>
     <style>
         nav {
-            height: 40px;
-            text-align: left;
-            background: chartreuse;
+            height: 50px;
+            text-align: center;
+            background: dimgray;
             color: black;
             font-size: 20px;
             padding-left: 50px;
             padding-right: 50px;
             font-family: Arial,serif;
+            border-bottom: chartreuse 1px solid;
         }
         body {
             background: dimgrey;
@@ -21,14 +22,20 @@
         }
         nav a {
             text-decoration: none;
-            color: dimgrey;
+            color: honeydew;
             padding: 20px;
         }
         nav a:hover {
-            color: black;
+            color: chartreuse;
+        }
+        #nav-container {
+            width: 60%;
         }
         #main-container {
-            width: 80%;
+            width: 60%;
+            margin: auto;
+        }
+        #table-container {
             margin: auto;
         }
         #header-logo {
@@ -41,15 +48,24 @@
             border-radius: 6px;
             border-style: none;
         }
+        .remove-button {
+            background: orangered;
+            padding: 8px;
+            border-radius: 6px;
+            border-style: none;
+        }
 
     </style>
 </head>
 <body>
+<!-- TODO: Si insertas un piloto y a continuacion lo actualizas, desaparece D: -->
     <nav>
-        <a href="/"><img src="./static/logo.png" id="header-logo" alt="logo"/></a>
-        <a href="/">Pilotos</a>
-        <a href="/calendar">Calendario</a>
-        <a href="/teams">Equipos</a>
+        <div id="nav-container">
+            <!-- <a href="/"><img src="./static/logo.png" id="header-logo" alt="logo"/></a> -->
+            <a href="/">Pilotos</a>
+            <a href="/calendar">Calendario</a>
+            <a href="/teams">Equipos</a>
+        </div>
     </nav>
     <div id="main-container">
       <div id="table-container">
@@ -57,13 +73,16 @@
           <tr>
             <th>Piloto</th>
             <th>Puntos</th>
-            <th>Actualizar</th>
+            <th></th>
+            <th></th>
           </tr>
           {% for d in drivers %}
           <tr>
             <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
             <td><form id="{{ d.id }}-form" class="update-driver-form"><input id="score" type="number" value="{{ d.score }}"></form></td>
-            <th><button form="{{ d.id }}-form" class="update-button" type="button" onclick="update({{ d.id }})">Actualizar</button></th>
+            <td style="display: none" class="dorsal">{{ d.id }}</td>
+            <td><button form="{{ d.id }}-form" class="update-button" type="button" onclick="update({{ d.id }})">Actualizar</button></td>
+            <td><button form="{{ d.id }}-form" class="remove-button" type="button" onclick="remove({{ d.id }})">Eliminar</button></td>
           </tr>
           {% endfor %}
         </table>
@@ -72,6 +91,7 @@
       <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
     </div>
   <script>
+
     function insertDriverForm() {
       const contenedor = document.getElementById("driver-form");
       const formulario = document.createElement("form");
@@ -154,8 +174,10 @@
 
       fila.innerHTML =
               '<td><p id="' + numero + '-id">' + nombre + '</p></td>\
-               <td><form id="' + numero + '-form"  class="update-driver-form" method="post" onsubmit="update(' + numero + ')"><input id="score" type="number" value="' + puntos + '">\</form>\</td>\
-               <td><button form="' + numero + '-form" class="update-button" type="submit">Actualizar</button></td>'
+               <td><form id="' + numero + '-form"  class="update-driver-form"><input id="score" type="number" value="' + puntos + '">\</form>\</td>\
+               <td style="display: none" class="dorsal">' + numero + '</td>\
+               <td><button form="' + numero + '-form" class="update-button" type="button" onclick="update(' + numero + ')">Actualizar</button></td>\
+               <td><button form="' + numero + '-remove" class="remove-button" type="button" onclick="remove(' + numero + ')">Eliminar</button></td>'
       ;
       tabla.appendChild(fila);
 
@@ -187,6 +209,38 @@
       sortTable();
 
       alert("Piloto actualizado/a correctamente!");
+    }
+
+    function remove(id) {
+      const table = document.getElementById("driver-table");
+      const rows = table.rows;
+      let currentRow;
+      let foundIt = false;
+
+      for (let i = 1; i < (rows.length); i++) {
+          currentRow = i;
+          console.log(parseInt(rows[i].getElementsByTagName("TD")[2].innerText) + " : " + id);
+          if (parseInt(rows[i].getElementsByTagName("TD")[2].innerText) === id) {
+              foundIt = true;
+              break;
+          }
+      }
+
+      if (foundIt) {
+          table.deleteRow(currentRow);
+
+          let formData = new FormData();
+          formData.append("id", id);
+          formData.append("form", "remove");
+
+          let request = new XMLHttpRequest();
+          request.open("POST", "/");
+          request.send(formData);
+
+          alert("Piloto eliminado/a correctamente!");
+      } else {
+          alert("Error al eliminar el/la piloto");
+      }
     }
 
     function sortTable() {
