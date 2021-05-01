@@ -52,8 +52,9 @@
         </div>
     </nav>
     <div id="main-container">
-      <h3>Equipos y pilotos</h3>
+      <h1>Equipos y pilotos</h1>
       <div id="main-table-container">
+        {% if teams.count() > 0 %}
         <table id="teams-table">
           <tr>
             <th>Equipo</th>
@@ -61,26 +62,28 @@
             <th></th>
             <th></th>
           </tr>
-          {% for key, value in teams %}
+          {% for t in teams %}
           <tr>
-              <!-- {{ key }} -->
-            <th>{{ key }}</th>
-            {% if value|length == 0 %}
-            <th></th>
-            <th></th>
-            {% elif value|length == 1 %}
-            <th>{{ value[0] }}</th>
-            <th></th>
+            <td>{{ t.name }}</td>
+            {% if t.driver1 and t.driver2 %}
+            <td>{{ t.driver1 }}, {{ t.driver2 }}</td>
+            {% elif t.driver1 %}
+            <td>t.driver1</td>
+            {% elif t.driver2 %}
+            <td>t.driver2</td>
             {% else %}
-            <th>{{ value[0] }}</th>
-            <th>{{ value[1] }}</th>
+            <td>No tiene pilotos</td>
             {% endif %}
-            <th></th>
+            <td><button class="update-button" onclick="update({{ t.name }})" type="button">Actualizar</button></td>
+            <td><button class="remove-button" onclick="remove({{ t.name }})" type="button">Eliminar</button></td>
           </tr>
           {% endfor %}
         </table>
+        {% else %}
+        <p id="no-teams-banner">No se han encontrado equipos</p>
+        {% endif %}
       </div>
-      {% if freelance|length > 0 %}
+      {% if freelance.count() > 0 %}
       <div id="freelance-drivers-container">
           <h3>Pilotos sin equipo</h3>
         <ol id="freelance-list">
@@ -89,6 +92,8 @@
             {% endfor %}
         </ol>
       </div>
+      {% else %}
+      <p id="no-freelance-banner">No hay pilotos sin equipo</p>
       {% endif %}
     </div>
 

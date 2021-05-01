@@ -7,18 +7,30 @@ pilotos ya existentes. Todos estos datos son guardados en data.json
 
 import webapp2
 from webapp2_extras import jinja2
-import json
+from google.appengine.api import users
+from google.appengine.ext import ndb
+
+# import model.DriverDto
+from model.DriverDto import Driver
 
 
 class MainHandler(webapp2.RequestHandler):
     def get(self):
-        # read file
-        with open('data.json', 'r') as f:
-            data = json.load(f)
-        drivers = list(data["drivers"])
+        user = users.get_current_user()
+
+        if user:
+            user_name = user.nickname()
+            is_admin = users.is_current_user_admin()
+        else:
+            user_name = None
+            is_admin = False
+
+        drivers = Driver.query().order(-Driver.score)
 
         susts = {
-            "drivers": drivers
+            "drivers": drivers,
+            "username": user_name,
+            "is_admin": is_admin
         }
 
         jinja = jinja2.get_jinja2(app=self.app)
@@ -33,23 +45,22 @@ class MainHandler(webapp2.RequestHandler):
         if post_type == "insert" and id_piloto:
             id_piloto = int(id_piloto)
             puntos = int(puntos)
-            with open('data.json', 'a') as f:
-                data = json.load(f)
-                data["drivers"].append({"id": id_piloto, "name": nombre, "score": puntos})
+            # Store the new driver
+            driver = Driver(id=id_piloto, name=nombre, score=puntos)
+            driver.put()
 
         elif post_type == "modify" and id_piloto:
             id_piloto = int(id_piloto)
             puntos = int(puntos)
-            with open('data.json', 'r') as f:
-                data = json.load(f)
-                drivers = list(data["drivers"])
-                for d in drivers:
-                    if d["id"] == id_piloto:
-                        driver = d
-                        break
-            driver["score"] = puntos
-            with open('data.json', 'w') as f:
-                json.dump(driver, f)
+
+            driver = Driver.query(Driver.id == id_piloto).fetch()[0]
+            driver.score = puntos
+            driver.put()
+
+        elif post_type == "remove" and id_piloto:
+            id_piloto = int(id_piloto)
+            driver = Driver.query(Driver.id == id_piloto).fetch()[0]
+            driver.delete()
 
         else:
             pass

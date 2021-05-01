@@ -61,219 +61,255 @@
 <!-- TODO: Si insertas un piloto y a continuacion lo actualizas, desaparece D: -->
     <nav>
         <div id="nav-container">
-            <!-- <a href="/"><img src="./static/logo.png" id="header-logo" alt="logo"/></a> -->
             <a href="/">Pilotos</a>
             <a href="/calendar">Calendario</a>
             <a href="/teams">Equipos</a>
         </div>
     </nav>
     <div id="main-container">
-      <div id="table-container">
-        <table id="driver-table">
-          <tr>
-            <th>Piloto</th>
-            <th>Puntos</th>
-            <th></th>
-            <th></th>
-          </tr>
-          {% for d in drivers %}
-          <tr>
-            <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
-            <td><form id="{{ d.id }}-form" class="update-driver-form"><input id="score" type="number" value="{{ d.score }}"></form></td>
-            <td style="display: none" class="dorsal">{{ d.id }}</td>
-            <td><button form="{{ d.id }}-form" class="update-button" type="button" onclick="update({{ d.id }})">Actualizar</button></td>
-            <td><button form="{{ d.id }}-form" class="remove-button" type="button" onclick="remove({{ d.id }})">Eliminar</button></td>
-          </tr>
-          {% endfor %}
-        </table>
+        <h1>Clasificacion de pilotos</h1>
+        <div id="table-container">
+        {% if drivers.count() > 0 %}
+            <table id="driver-table">
+                <tr>
+                    <th>Piloto</th>
+                    <th>Puntos</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                {% for d in drivers %}
+                <tr>
+                    <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
+                    <td><form class="update-driver-form" id="{{ d.id }}-form"><input id="score" type="number" value="{{ d.score }}"></form></td>
+                    <td class="dorsal" style="display: none">{{ d.id }}</td>
+                    <td><button class="update-button" form="{{ d.id }}-form" onclick="update({{ d.id }})" type="button">Actualizar</button></td>
+                    <td><button class="remove-button" form="{{ d.id }}-form" onclick="remove({{ d.id }})" type="button">Eliminar</button></td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p id="no-drivers-banner">No se han encontrado pilotos en la base de datos</p>
+        {% endif %}
       </div>
       <div id="driver-form"></div>
       <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
     </div>
   <script>
+      function insertDriverForm() {
+          const contenedor = document.getElementById("driver-form");
+          const formulario = document.createElement("form");
+          const nombreInput = document.createElement("input");
+          const numeroInput = document.createElement("input");
+          const puntosInput = document.createElement("input");
+          const nombreLabel = document.createElement("label");
+          const numeroLabel = document.createElement("label");
+          const puntosLabel = document.createElement("label");
+          const boton = document.createElement("button");
 
-    function insertDriverForm() {
-      const contenedor = document.getElementById("driver-form");
-      const formulario = document.createElement("form");
-      const nombreInput = document.createElement("input");
-      const numeroInput = document.createElement("input");
-      const puntosInput = document.createElement("input");
-      const nombreLabel = document.createElement("label");
-      const numeroLabel = document.createElement("label");
-      const puntosLabel = document.createElement("label");
-      const boton = document.createElement("button");
+          document.getElementById("insert-driver-button").style.display = "none";
 
-      document.getElementById("insert-driver-button").style.display = "none";
+          nombreLabel.for = "name-input";
+          nombreLabel.innerText ="Nombre del piloto: ";
+          numeroLabel.for = "number-input";
+          numeroLabel.innerText = "Dorsal: ";
+          puntosLabel.for = "score-input";
+          puntosLabel.innerText ="Puntos: ";
 
-      nombreLabel.for = "name-input";
-      nombreLabel.innerText ="Nombre del piloto: ";
-      numeroLabel.for = "number-input";
-      numeroLabel.innerText = "Dorsal: ";
-      puntosLabel.for = "score-input";
-      puntosLabel.innerText ="Puntos: ";
+          nombreInput.type = "text";
+          nombreInput.id = nombreInput.name = "name-input";
+          nombreInput.style.display = "block";
+          numeroInput.type = "text";
+          numeroInput.id = numeroInput.name = "number-input";
+          numeroInput.style.display = "block";
+          puntosInput.type = "number";
+          puntosInput.id = nombreInput.name = "score-input";
+          puntosInput.style.display = "block";
 
-      nombreInput.type = "text";
-      nombreInput.id = nombreInput.name = "name-input";
-      nombreInput.style.display = "block";
-      numeroInput.type = "text";
-      numeroInput.id = numeroInput.name = "number-input";
-      numeroInput.style.display = "block";
-      puntosInput.type = "number";
-      puntosInput.id = nombreInput.name = "score-input";
-      puntosInput.style.display = "block";
+          boton.type = "button";
+          boton.innerText = "Insertar";
+          boton.onclick = function() {insertDriver()};
 
-      boton.type = "button";
-      boton.innerText = "Insertar";
-      boton.onclick = function() {insertDriver()};
+          formulario.id = "insert-driver-form";
+          //formulario.onsubmit = "insertDriver()";
+          //formulario.action = "/";
+          //formulario.method = "post";
 
-      formulario.id = "insert-driver-form";
-      //formulario.onsubmit = "insertDriver()";
-      //formulario.action = "/";
-      //formulario.method = "post";
-
-      formulario.appendChild(nombreLabel);
-      formulario.appendChild(nombreInput);
-      formulario.appendChild(numeroLabel);
-      formulario.appendChild(numeroInput);
-      formulario.appendChild(puntosLabel);
-      formulario.appendChild(puntosInput);
-      formulario.appendChild(boton);
-      contenedor.appendChild(formulario);
-    }
-
-    function insertDriver() {
-      const nombre = document.getElementById("name-input").value;
-      const numero = document.getElementById("number-input").value;
-      let puntos = document.getElementById("score-input").value;
-      const tabla = document.getElementById("driver-table");
-      const fila = document.createElement("tr");
-
-      if(nombre === "") {
-        alert("El nombre no puede estar vacio");
-        return false;
-      } else if (!/^[A-Z]\. [a-zA-Z]+$/.test(nombre)) {
-        alert("Formato de nombre incorrecto. Utiliza caracteres alfabéticos.");
-        return false;
-      }
-      if(numero === "") {
-        alert("El dorsal no puede estar vacio");
-        return false;
-      } else if (!/^[1-9][0-9]?/.test(numero)) {
-        alert("Formato de dorsal incorrecto. Utiliza caracteres numéricos.");
-        return false;
-      }
-      if(puntos === "") {
-        puntos = 0;
+          formulario.appendChild(nombreLabel);
+          formulario.appendChild(nombreInput);
+          formulario.appendChild(numeroLabel);
+          formulario.appendChild(numeroInput);
+          formulario.appendChild(puntosLabel);
+          formulario.appendChild(puntosInput);
+          formulario.appendChild(boton);
+          contenedor.appendChild(formulario);
       }
 
-      let formData = new FormData();
-      formData.append("name", nombre);
-      formData.append("id", numero);
-      formData.append("score", puntos);
-      formData.append("form", "insert");
+      function insertDriver() {
+          let tabla = document.getElementById("driver-table");
+          let emptyTable = false;
 
-      fila.innerHTML =
-              '<td><p id="' + numero + '-id">' + nombre + '</p></td>\
-               <td><form id="' + numero + '-form"  class="update-driver-form"><input id="score" type="number" value="' + puntos + '">\</form>\</td>\
-               <td style="display: none" class="dorsal">' + numero + '</td>\
-               <td><button form="' + numero + '-form" class="update-button" type="button" onclick="update(' + numero + ')">Actualizar</button></td>\
-               <td><button form="' + numero + '-remove" class="remove-button" type="button" onclick="remove(' + numero + ')">Eliminar</button></td>'
-      ;
-      tabla.appendChild(fila);
-
-      sortTable();
-
-      document.getElementById("driver-form").innerHTML = "";
-      document.getElementById("insert-driver-button").style.display = "inline-block";
-
-      alert("Piloto insertado/a correctamente!");
-
-      let request = new XMLHttpRequest();
-      request.open("POST", "/", true);
-      request.send(formData);
-    }
-
-    function update(id) {
-      const puntos =  document.getElementById(id + "-form")["score"].value;
-      console.log(puntos);
-
-      let formData = new FormData();
-      formData.append("id", id);
-      formData.append("score", puntos);
-      formData.append("form", "modify");
-
-      let request = new XMLHttpRequest();
-      request.open("POST", "/");
-      request.send(formData);
-
-      sortTable();
-
-      alert("Piloto actualizado/a correctamente!");
-    }
-
-    function remove(id) {
-      const table = document.getElementById("driver-table");
-      const rows = table.rows;
-      let currentRow;
-      let foundIt = false;
-
-      for (let i = 1; i < (rows.length); i++) {
-          currentRow = i;
-          console.log(parseInt(rows[i].getElementsByTagName("TD")[2].innerText) + " : " + id);
-          if (parseInt(rows[i].getElementsByTagName("TD")[2].innerText) === id) {
-              foundIt = true;
-              break;
+          if(tabla === null) {
+              tabla = document.createElement("Table");
+              tabla.id = "driver-table";
+              tabla.innerHTML = '<tr><th>Piloto</th><th>Puntos</th><th></th><th></th></tr>';
+              emptyTable = true;
           }
+
+          const nombre = document.getElementById("name-input").value;
+          const numero = document.getElementById("number-input").value;
+          let puntos = document.getElementById("score-input").value;
+          const fila = document.createElement("tr");
+
+          if(nombre === "") {
+              alert("El nombre no puede estar vacio");
+              return false;
+          } else if (!/^[A-Z]\. [a-zA-Z]+$/.test(nombre)) {
+              alert("Formato de nombre incorrecto. Utiliza caracteres alfabéticos.");
+              return false;
+          }
+          if(numero === "") {
+              alert("El dorsal no puede estar vacio");
+              return false;
+          } else if (!/^[1-9][0-9]?/.test(numero)) {
+              alert("Formato de dorsal incorrecto. Utiliza caracteres numéricos.");
+              return false;
+          }
+          if(puntos === "") {
+              puntos = 0;
+          }
+
+          let formData = new FormData();
+          formData.append("name", nombre);
+          formData.append("id", numero);
+          formData.append("score", puntos);
+          formData.append("form", "insert");
+
+          fila.innerHTML =
+                  '<td><p id="' + numero + '-id">' + nombre + '</p></td>\
+                   <td><form id="' + numero + '-form"  class="update-driver-form"><input id="score" type="number" value="' + puntos + '">\</form>\</td>\
+                   <td style="display: none" class="dorsal">' + numero + '</td>\
+                   <td><button form="' + numero + '-form" class="update-button" type="button" onclick="update(' + numero + ')">Actualizar</button></td>\
+                   <td><button form="' + numero + '-remove" class="remove-button" type="button" onclick="remove(' + numero + ')">Eliminar</button></td>'
+          ;
+          tabla.appendChild(fila);
+
+          if (emptyTable) {
+              document.getElementById("no-drivers-banner").remove();
+              document.getElementById("table-container").appendChild(tabla);
+          }
+
+          sortTable();
+
+          document.getElementById("driver-form").innerHTML = "";
+          document.getElementById("insert-driver-button").style.display = "inline-block";
+
+          alert("Piloto insertado/a correctamente!");
+
+          let request = new XMLHttpRequest();
+          request.open("POST", "/", true);
+          request.send(formData);
       }
 
-      if (foundIt) {
-          table.deleteRow(currentRow);
+      function update(id) {
+          const puntos =  document.getElementById(id + "-form")["score"].value;
 
           let formData = new FormData();
           formData.append("id", id);
-          formData.append("form", "remove");
+          formData.append("score", puntos);
+          formData.append("form", "modify");
 
           let request = new XMLHttpRequest();
           request.open("POST", "/");
           request.send(formData);
 
-          alert("Piloto eliminado/a correctamente!");
-      } else {
-          alert("Error al eliminar el/la piloto");
-      }
-    }
+          sortTable();
 
-    function sortTable() {
-      let table, rows, switching, i, x, y, shouldSwitch;
-      table = document.getElementById("driver-table");
-      switching = true;
-      // Se recorre el bucle hasta que todos los elementos esten ordenados
-      while (switching) {
-        switching = false;
-        rows = table.rows;
-        // Se deben recorrer todas las filas salvo la primera, que es la cabecera
-        for (i = 1; i < (rows.length - 1); i++) {
-          // start by saying there should be no switching:
-          shouldSwitch = false;
-          // Se compara la puntuacion de una fila con la de la siguiente fila
-          let xchildren = rows[i].getElementsByTagName("TD")[1].childNodes;
-          let ychildren = rows[i + 1].getElementsByTagName("TD")[1].childNodes;
-          let x = parseInt(xchildren[0]["score"].value, 10);
-          let y = parseInt(ychildren[0]["score"].value, 10);
-          // Si la segunda es mayor que la primera, deben intercambiarse
-          if (x < y) {
-            // Rompemos el bucle para intercambiarlos
-            shouldSwitch = true;
-            break;
-          }
-        }
-        if (shouldSwitch) {
-          // Notificamos que se ha realizado el cambio
-          rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-          switching = true;
-        }
+          alert("Piloto actualizado/a correctamente!");
       }
-    }
+
+      function remove(id) {
+          const table = document.getElementById("driver-table");
+          const rows = table.rows;
+          let currentRow;
+          let foundIt = false;
+
+          for (let i = 1; i < (rows.length); i++) {
+              currentRow = i;
+              if (parseInt(rows[i].getElementsByTagName("TD")[2].innerText) === id) {
+                  foundIt = true;
+                  break;
+              }
+          }
+
+          if (foundIt) {
+              table.deleteRow(currentRow);
+
+              let formData = new FormData();
+              formData.append("id", id);
+              formData.append("form", "remove");
+
+              let request = new XMLHttpRequest();
+              request.open("POST", "/");
+              request.send(formData);
+
+              if (CountRows("driver-table") < 1) {
+                  let banner = document.createElement("p");
+                  banner.id = "no-drivers-banner";
+                  banner.innerText = "No se han encontrado pilotos en la base de datos";
+
+                  document.getElementById("driver-table").remove();
+                  document.getElementById("table-container").appendChild(banner);
+              }
+
+              alert("Piloto eliminado/a correctamente!");
+          } else {
+              alert("Error al eliminar el/la piloto");
+          }
+      }
+
+      function CountRows(tableId) {
+          let rowCount = 0;
+          let table = document.getElementById(tableId);
+          let rows = table.getElementsByTagName("tr");
+          for (let i = 0; i < rows.length; i++) {
+              if (rows[i].getElementsByTagName("td").length > 0) {
+                  rowCount++;
+              }
+          }
+          return rowCount;
+      }
+
+      function sortTable() {
+          let table, rows, switching, i, shouldSwitch;
+          table = document.getElementById("driver-table");
+          switching = true;
+          // Se recorre el bucle hasta que todos los elementos esten ordenados
+          while (switching) {
+              switching = false;
+              rows = table.rows;
+              // Se deben recorrer todas las filas salvo la primera, que es la cabecera
+              for (i = 1; i < (rows.length - 1); i++) {
+                  // start by saying there should be no switching:
+                  shouldSwitch = false;
+                  // Se compara la puntuacion de una fila con la de la siguiente fila
+                  let xchildren = rows[i].getElementsByTagName("TD")[1].childNodes;
+                  let ychildren = rows[i + 1].getElementsByTagName("TD")[1].childNodes;
+                  let x = parseInt(xchildren[0]["score"].value, 10);
+                  let y = parseInt(ychildren[0]["score"].value, 10);
+                  // Si la segunda es mayor que la primera, deben intercambiarse
+                  if (x < y) {
+                      // Rompemos el bucle para intercambiarlos
+                      shouldSwitch = true;
+                      break;
+                  }
+              }
+              if (shouldSwitch) {
+                  // Notificamos que se ha realizado el cambio
+                  rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                  switching = true;
+              }
+          }
+      }
   </script>
 </body>
 </html>

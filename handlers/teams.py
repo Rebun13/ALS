@@ -1,39 +1,51 @@
 #!/usr/bin/env python
 
-"""
-Se muestra la informacion basica sobre los equipos, es decir, su nombre y sus pilotos. Ademas, se podran cambiar los
-pilotos entre equipos. Todos estos datos son guardados en data.json
-"""
-
 import webapp2
 from webapp2_extras import jinja2
-import json
+from google.appengine.api import users
+from model.TeamDto import Team
+from model.DriverDto import Driver
 
 
-class TeamsHandler(webapp2.RequestHandler):
+def search_driver_name(driver_id, drivers):
+    for d in drivers:
+        if d.id == driver_id:
+            toret = d.name
+            drivers.remove(d)
+            return toret
+    return None
+
+
+class TeamHandler(webapp2.RequestHandler):
     def get(self):
-        # read file
-        with open('data.json', 'r') as f:
-            data = json.load(f)
-        drivers = list(data["drivers"])
-        teams_raw = list(data["teams"])
+        user = users.get_current_user()
 
-        teams = dict()
+        if user:
+            user_name = user.nickname()
+            is_admin = users.is_current_user_admin()
+        else:
+            user_name = None
+            is_admin = False
 
-        for t in teams:
-            ids = t["drivers"]
-            n = len(ids)
-            d = []
-            for i in range(n - 1):
-                found_it = False
-                j = 0
-                m = len(drivers)
-                while not found_it and j < m:
-                    if drivers[j]["id"] == ids[i]:
-                        found_it = True
-                        d.append(drivers[j]["name"])
-                        drivers.remove(j)
-            teams[t["name"]] = d
+        drivers = Driver.query().fetch()
+        teams_raw = Team.query().fetch()
+
+        teams = list(dict())
+
+        for t in teams_raw:
+            driver1 = t.driver1
+            driver2 = t.driver2
+            current_team = dict()
+            current_team["name"] = t.name
+            if driver1:
+                name = search_driver_name(driver1.id, drivers)
+                if name:
+                    current_team["driver1"] = name
+            if driver2:
+                name = search_driver_name(driver2.id, drivers)
+                if name:
+                    current_team["driver2"] = name
+            teams.append(current_team)
 
         susts = {
             "teams": teams,
@@ -43,7 +55,34 @@ class TeamsHandler(webapp2.RequestHandler):
         jinja = jinja2.get_jinja2(app=self.app)
         self.response.write(jinja.render_template("teams.html", **susts))
 
+    def post(self):
+        post_type = self.request.get('form', 'ERROR')
+        nombre = self.request.get('name', 'ERROR')
+        piloto1 = self.request.get('driver1', 'ERROR')
+        piloto2 = self.request.get('driver2', 'ERROR')
+
+        if post_type == "insert" and nombre:
+            # Store the new driver
+            team = Team(name=nombre)
+            team.put()
+
+        elif post_type == "modify" and nombre:
+            team = Team.query(Team.name == nombre).fetch()[0]
+            team.name = nombre
+            if piloto1:
+                team.driver1 = int(piloto1)
+            if piloto2:
+                team.driver2 = int(piloto2)
+            team.put()
+
+        elif post_type == "remove" and nombre:
+            team = Team.query(Team.name == nombre).fetch()[0]
+            team.delete()
+
+        else:
+            pass
+
 
 app = webapp2.WSGIApplication([
-    ('/teams', TeamsHandler)
+    ('/teams', TeamHandler)
 ], debug=True)
