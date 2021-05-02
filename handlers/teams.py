@@ -45,11 +45,11 @@ class TeamHandler(webapp2.RequestHandler):
             current_team = dict()
             current_team["name"] = t.name
             if driver1:
-                name = search_driver_name(driver1.id, drivers)
+                name = search_driver_name(driver1, drivers)
                 if name:
                     current_team["driver1"] = name
             if driver2:
-                name = search_driver_name(driver2.id, drivers)
+                name = search_driver_name(driver2, drivers)
                 if name:
                     current_team["driver2"] = name
             teams.append(current_team)
@@ -97,7 +97,9 @@ class TeamHandler(webapp2.RequestHandler):
             team.delete()
 
         elif post_type == "freelance" and nombre:
-            team = Team.query(Team.name == nombre).fetch()[0]
+            teamlist = Team.query(Team.name == nombre).fetch(1)
+            length = len(teamlist)
+            team = teamlist[length - 1]
             if piloto1 == "":
                 team.driver2 = ""
             elif piloto2 == "":

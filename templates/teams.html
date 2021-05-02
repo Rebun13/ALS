@@ -6,7 +6,7 @@
     <style>
         nav {
             height: 50px;
-            text-align: center;
+            text-align: left;
             background: dimgray;
             color: black;
             font-size: 20px;
@@ -30,13 +30,14 @@
         }
         #nav-container {
             width: 60%;
+            margin: auto;
         }
         #main-container {
             width: 60%;
             margin: auto;
         }
         table {
-            margin: auto;
+            text-align: left;
         }
         .update-button {
             background: chartreuse;
@@ -80,7 +81,7 @@
                     <th></th>
                 </tr>
                 {% for t in teams %}
-                <tr id="{{ t.name }}}">
+                <tr id="{{ t.name }}">
                     <td>{{ t.name }}</td>
                     {% if t.driver1 and t.driver2 %}
                     <td>{{ t.driver1 }} y {{ t.driver2 }}</td>
@@ -222,7 +223,7 @@
             RemoveFromList(piloto2, document.getElementById("freelance-list"));
 
             let request = new XMLHttpRequest();
-            request.open("POST", "/", true);
+            request.open("POST", "/teams", true);
             request.send(formData);
 
             alert("Equipo insertado correctamente!");
@@ -233,29 +234,36 @@
             document.getElementById("insert-button").disabled = true;
             document.getElementById("update-button").disabled = false;
             document.getElementById("insert-team-button").style.display = "none";
-
-            const fila = document.getElementById(nombre);
-            const pilotos = fila.getElementsByTagName("TD")[1].innerText.split(', ')
+            //console.log(nombre.id);
+            const fila = document.getElementById(nombre.id);
+            const pilotos = fila.getElementsByTagName("TD")[1].innerText.split(' y ')
             const piloto1 = pilotos[0];
             const piloto2 = pilotos[1];
+            console.log(piloto1);
+            console.log(piloto2);
             document.forms["team-form"]["name-input"].value = fila.getElementsByTagName("TD")[0].innerText;
-            document.forms["team-form"]["driver1-select"][piloto1].selected = true;
-            document.forms["team-form"]["driver1-select"][pilotos[1]].selected = true;
 
+            const sel1 = document.getElementById("driver1-select");
+            const sel2 = document.getElementById("driver2-select");
             if (piloto1 !== "") {
-                const sel = document.getElementById("driver1-select");
-                const d = document.createElement("option");
-                d.value = "current";
-                d.innerText = piloto1;
-                d.selected = true;
-                sel.disabled = true;
-                sel.append(d);
+                const d1 = document.createElement("option");
+                d1.value = "current";
+                d1.innerText = piloto1;
+                d1.selected = true;
+                sel1.disabled = true;
+                sel1.append(d1);
                 const botonFL1 = document.getElementById("driver1-freelance-button");
                 botonFL1.onclick = function() {makeDriverFreelance(piloto1, 1, nombre)};
                 botonFL1.style.display = "inline";
             }
 
             if (piloto2 !== "") {
+                const d2 = document.createElement("option");
+                d2.value = "current";
+                d2.innerText = piloto2;
+                d2.selected = true;
+                sel2.disabled = true;
+                sel2.append(d2);
                 const botonFL2 = document.getElementById("driver2-freelance-button");
                 botonFL2.onclick = function() {makeDriverFreelance(piloto2, 2, nombre)};
                 botonFL2.style.display = "inline";
@@ -297,7 +305,7 @@
             formData.append("form", "freelance");
 
             let request = new XMLHttpRequest();
-            request.open("POST", "/", true);
+            request.open("POST", "/teams", true);
             request.send(formData);
         }
 
@@ -338,7 +346,7 @@
             formData.append("form", "modify");
 
             let request = new XMLHttpRequest();
-            request.open("POST", "/");
+            request.open("POST", "/teams");
             request.send(formData);
 
             alert("Equipo actualizado correctamente!");
@@ -384,7 +392,7 @@
                 formData.append("form", "remove");
 
                 let request = new XMLHttpRequest();
-                request.open("POST", "/");
+                request.open("POST", "/teams");
                 request.send(formData);
 
                 if (CountRows("team-table") < 1) {
@@ -398,7 +406,7 @@
 
                 alert("Piloto eliminado/a correctamente!");
             } else {
-                alert("Error al eliminar el/la piloto");
+                alert("Error al eliminar el equipo");
             }
         }
 
