@@ -50,11 +50,16 @@
             border-radius: 6px;
             border-style: none;
         }
+        form input {
+            display: block;
+        }
+        select {
+            display: block;
+        }
 
     </style>
 </head>
 <body>
-<!-- TODO: Si insertas un piloto y a continuacion lo actualizas, desaparece D: -->
     <nav>
         <div id="nav-container">
             <!-- <a href="/"><img src="./static/logo.png" id="header-logo" alt="logo"/></a> -->
@@ -65,7 +70,7 @@
     </nav>
     <div id="main-container">
         <h1>Equipos y pilotos</h1>
-        <div id="main-table-container">
+        <div id="table-container">
             {% if teams|length > 0 %}
             <table id="team-table">
                 <tr>
@@ -75,7 +80,7 @@
                     <th></th>
                 </tr>
                 {% for t in teams %}
-                <tr>
+                <tr id="{{ t.name }}}">
                     <td>{{ t.name }}</td>
                     {% if t.driver1 and t.driver2 %}
                     <td>{{ t.driver1 }} y {{ t.driver2 }}</td>
@@ -86,7 +91,7 @@
                     {% else %}
                     <td>No tiene pilotos</td>
                     {% endif %}
-                    <td><button class="update-button" onclick="update({{ t.name }})" type="button">Actualizar</button></td>
+                    <td><button class="update-button" onclick="updateTeamForm({{ t.name }})" type="button">Actualizar</button></td>
                     <td><button class="remove-button" onclick="remove({{ t.name }})" type="button">Eliminar</button></td>
                 </tr>
                 {% endfor %}
@@ -94,8 +99,8 @@
         {% else %}
         <p id="no-teams-banner">No se han encontrado equipos</p>
         {% endif %}
-        <button id="insert-team-button" onclick="insertTeamForm()">Inserta un nuevo equipo</button>
         </div>
+        <button id="insert-team-button" onclick="insertTeamForm()">Inserta un nuevo equipo</button>
         <div id="freelance-drivers-container">
             <h3>Pilotos sin equipo</h3>
             {% if freelance|length > 0 %}
@@ -108,54 +113,49 @@
             <p id="no-freelance-banner">No hay pilotos sin equipo</p>
             {% endif %}
         </div>
-        <div id="team-form"></div>
+        <div id="team-form-container" style="display: none">
+            <form id="team-form">
+                <label for="name-input">Nombre del equipo:</label>
+                <input type="text" id="name-input" name="name-input">
+
+                <label for="driver1-select">Nombre de el/la primer/a piloto:</label>
+                <select id="driver1-select">
+                {% if freelance|length > 0 %}
+                    <option value="" selected>Selecciona un/a piloto</option>
+                    {% for d in freelance %}
+                    <option value="{{ d.name }}">{{ d.name }}</option>
+                    {% endfor %}
+                {% else %}
+                <option value="">No hay pilotos</option>
+                {% endif %}
+                </select>
+                <button type="button" id="driver1-freelance-button" style="display: none">Liberar piloto</button>
+
+                <label for="driver2-select">Nombre de el/la segundo/a piloto:</label>
+                <select id="driver2-select">
+                {% if freelance|length > 0 %}
+                    <option value="" selected>Selecciona un/a piloto</option>
+                    {% for d in freelance %}
+                    <option value="{{ d.name }}">{{ d.name }}</option>
+                    {% endfor %}
+                {% else %}
+                    <option value="">No hay pilotos</option>
+                {% endif %}
+                </select>
+                <button type="button" id="driver2-freelance-button" style="display: none">Liberar piloto</button>
+
+                <button type="button" id="insert-button" onclick="insertTeam()" disabled>Insertar</button>
+                <button type="button" id="update-button" onclick="update()" disabled>Actualizar</button>
+            </form>
+        </div>
     </div>
 
     <script>
         function insertTeamForm() {
-            const contenedor = document.getElementById("team-form");
-            const formulario = document.createElement("form");
-            const nombreInput = document.createElement("input");
-            const piloto1Input = document.createElement("input");
-            const piloto2Input = document.createElement("input");
-            const nombreLabel = document.createElement("label");
-            const piloto1Label = document.createElement("label");
-            const piloto2Label = document.createElement("label");
-            const boton = document.createElement("button");
-
+            document.getElementById("team-form-container").style.display = "block";
+            document.getElementById("insert-button").disabled = false;
+            document.getElementById("update-button").disabled = true;
             document.getElementById("insert-team-button").style.display = "none";
-
-            nombreLabel.for = "name-input";
-            nombreLabel.innerText ="Nombre del equipo: ";
-            piloto1Label.for = "driver1-input";
-            piloto1Label.innerText = "Piloto 1 (dorsal): ";
-            piloto2Label.for = "driver2-input";
-            piloto2Label.innerText = "Piloto 2 (dorsal): ";
-
-            nombreInput.type = "text";
-            nombreInput.id = nombreInput.name = "name-input";
-            nombreInput.style.display = "block";
-            piloto1Input.type = "text";
-            piloto1Input.id = piloto1Input.name = "driver1-input";
-            piloto1Input.style.display = "block";
-            piloto2Input.type = "text";
-            piloto2Input.id = piloto2Input.name = "driver2-input";
-            piloto2Input.style.display = "block";
-
-            boton.type = "button";
-            boton.innerText = "Insertar";
-            boton.onclick = function() {insertTeam()};
-
-            formulario.id = "insert-team-form";
-
-            formulario.appendChild(nombreLabel);
-            formulario.appendChild(nombreInput);
-            formulario.appendChild(piloto1Label);
-            formulario.appendChild(piloto1Input);
-            formulario.appendChild(piloto2Label);
-            formulario.appendChild(piloto2Input);
-            formulario.appendChild(boton);
-            contenedor.appendChild(formulario);
         }
 
         function insertTeam() {
@@ -170,14 +170,14 @@
             }
 
             const nombre = document.getElementById("name-input").value;
-            const piloto1 = document.getElementById("driver1-input").value;
-            const piloto2 = document.getElementById("driver2-input").value;
+            const piloto1 = document.getElementById("driver1-select").value;
+            const piloto2 = document.getElementById("driver2-select").value;
             const fila = document.createElement("tr");
 
             if (nombre === "") {
                 alert("El nombre no puede estar vacio");
                 return false;
-            } else if (!/^[A-Z]\. [a-zA-Z]+$/.test(nombre)) {
+            } else if (!/^[a-zA-Z]+$/.test(nombre)) {
                 alert("Formato de nombre incorrecto. Utiliza caracteres alfabéticos.");
                 return false;
             }
@@ -197,14 +197,15 @@
                 str_pilotos = piloto1;
             } else if (piloto1 === "" && piloto2 !== "") {
                 str_pilotos = piloto2;
-            } else if (piloto1 === "" && piloto2 !== "") {
+            } else if (piloto1 !== "" && piloto2 !== "") {
                 str_pilotos = piloto1 + " y " + piloto2;
             }
+            console.log(str_pilotos);
             fila.innerHTML =
-                '<td>' + nombre + '</td>\
+                '<td id="' + nombre + '">' + nombre + '</td>\
                 <td>' + str_pilotos + '</td>\
-                <td><button className="update-button" onClick="update(' + nombre + ')" type="button">Actualizar</button></td>\
-                <td><button className="remove-button" onClick="remove(' + nombre + ')" type="button">Eliminar</button></td>'
+                <td><button class="update-button" onClick="updateTeamForm(' + nombre + ')" type="button">Actualizar</button></td>\
+                <td><button class="remove-button" onClick="remove(' + nombre + ')" type="button">Eliminar</button></td>'
             ;
 
             tabla.appendChild(fila);
@@ -214,116 +215,214 @@
                 document.getElementById("table-container").appendChild(tabla);
             }
 
-            document.getElementById("team-form").innerHTML = "";
+            document.getElementById("team-form-container").style.display = "none";
+            document.getElementById("insert-button").disabled = true;
             document.getElementById("insert-team-button").style.display = "inline-block";
+            RemoveFromList(piloto1, document.getElementById("freelance-list"));
+            RemoveFromList(piloto2, document.getElementById("freelance-list"));
+
+            let request = new XMLHttpRequest();
+            request.open("POST", "/", true);
+            request.send(formData);
 
             alert("Equipo insertado correctamente!");
+        }
+
+        function updateTeamForm(nombre) {
+            document.getElementById("team-form-container").style.display = "block";
+            document.getElementById("insert-button").disabled = true;
+            document.getElementById("update-button").disabled = false;
+            document.getElementById("insert-team-button").style.display = "none";
+
+            const fila = document.getElementById(nombre);
+            const pilotos = fila.getElementsByTagName("TD")[1].innerText.split(', ')
+            const piloto1 = pilotos[0];
+            const piloto2 = pilotos[1];
+            document.forms["team-form"]["name-input"].value = fila.getElementsByTagName("TD")[0].innerText;
+            document.forms["team-form"]["driver1-select"][piloto1].selected = true;
+            document.forms["team-form"]["driver1-select"][pilotos[1]].selected = true;
+
+            if (piloto1 !== "") {
+                const sel = document.getElementById("driver1-select");
+                const d = document.createElement("option");
+                d.value = "current";
+                d.innerText = piloto1;
+                d.selected = true;
+                sel.disabled = true;
+                sel.append(d);
+                const botonFL1 = document.getElementById("driver1-freelance-button");
+                botonFL1.onclick = function() {makeDriverFreelance(piloto1, 1, nombre)};
+                botonFL1.style.display = "inline";
+            }
+
+            if (piloto2 !== "") {
+                const botonFL2 = document.getElementById("driver2-freelance-button");
+                botonFL2.onclick = function() {makeDriverFreelance(piloto2, 2, nombre)};
+                botonFL2.style.display = "inline";
+            }
+
+            fila.remove();
+        }
+
+        function makeDriverFreelance(piloto, num, equipo) {
+            const li = document.createElement("li");
+            li.innerText = li.id = piloto;
+            document.getElementById("freelance-list").appendChild(li);
+
+            let formData = new FormData();
+            if (num === 1) {
+                formData.append("driver1", piloto);
+
+                const sel = document.getElementById("driver1-select");
+                for (let i = 1; i < sel.length; i++) {
+                    if (sel.options[i].value === piloto) {
+                        sel.options[i].remove();
+                        sel.options[0].selected = true;
+                        document.getElementById("driver1-freelance-button").style.display = "none";
+                    }
+                }
+            } else {
+                formData.append("driver2", piloto);
+
+                const sel = document.getElementById("driver2-select");
+                for (let i = 1; i < sel.length; i++) {
+                    if (sel.options[i].value === piloto) {
+                        sel.options[i].remove();
+                        sel.options[0].selected = true;
+                        document.getElementById("driver2-freelance-button").style.display = "none";
+                    }
+                }
+            }
+            formData.append("name", equipo);
+            formData.append("form", "freelance");
 
             let request = new XMLHttpRequest();
             request.open("POST", "/", true);
             request.send(formData);
         }
 
-      function update(id) {
-          const puntos =  document.getElementById(id + "-form")["score"].value;
+        function update() {
+            const tabla = document.getElementById("team-table");
+            const fila = document.createElement("tr");
 
-          let formData = new FormData();
-          formData.append("id", id);
-          formData.append("score", puntos);
-          formData.append("form", "modify");
+            let formData = new FormData();
 
-          let request = new XMLHttpRequest();
-          request.open("POST", "/");
-          request.send(formData);
+            const nombre = document.forms["team-form"]["name-input"].value;
+            const piloto1 = document.forms["team-form"]["driver1-select"].value;
+            const piloto2 = document.forms["team-form"]["driver2-select"].value;
 
-          sortTable();
+            formData.append("name", nombre);
 
-          alert("Equipo actualizado correctamente!");
-      }
+            let str_pilotos = "";
+            if (piloto1 !== "" && piloto2 !== "") {
+                str_pilotos = piloto1 + " y " + piloto2;
+                formData.append("driver1", piloto1);
+                formData.append("driver2", piloto2);
+            } else if (piloto1 === "") {
+                str_pilotos = piloto2;
+                formData.append("driver2", piloto2);
+            } else if (piloto2 === "") {
+                str_pilotos = piloto1;
+                formData.append("driver1", piloto1);
+            }
 
-      function remove(id) {
-          const table = document.getElementById("driver-table");
-          const rows = table.rows;
-          let currentRow;
-          let foundIt = false;
+            fila.innerHTML =
+                '<td id="' + nombre + '">' + nombre + '</td>\
+                <td>' + str_pilotos + '</td>\
+                <td><button class="update-button" onClick="updateTeamForm(' + nombre + ')" type="button">Actualizar</button></td>\
+                <td><button class="remove-button" onClick="remove(' + nombre + ')" type="button">Eliminar</button></td>'
+            ;
 
-          for (let i = 1; i < (rows.length); i++) {
-              currentRow = i;
-              if (parseInt(rows[i].getElementsByTagName("TD")[2].innerText) === id) {
-                  foundIt = true;
-                  break;
-              }
-          }
+            tabla.appendChild(fila);
 
-          if (foundIt) {
-              table.deleteRow(currentRow);
+            formData.append("form", "modify");
 
-              let formData = new FormData();
-              formData.append("id", id);
-              formData.append("form", "remove");
+            let request = new XMLHttpRequest();
+            request.open("POST", "/");
+            request.send(formData);
 
-              let request = new XMLHttpRequest();
-              request.open("POST", "/");
-              request.send(formData);
+            alert("Equipo actualizado correctamente!");
+        }
 
-              if (CountRows("driver-table") < 1) {
-                  let banner = document.createElement("p");
-                  banner.id = "no-drivers-banner";
-                  banner.innerText = "No se han encontrado pilotos en la base de datos";
+        function remove(name) {
+            const table = document.getElementById("team-table");
+            const rows = table.rows;
+            let currentRow;
+            let foundIt = false;
 
-                  document.getElementById("driver-table").remove();
-                  document.getElementById("table-container").appendChild(banner);
-              }
+            for (let i = 1; i < (rows.length); i++) {
+                currentRow = i;
+                if (parseInt(rows[i].getElementsByTagName("TD")[0].innerText) === name) {
+                    foundIt = true;
+                    break;
+                }
+            }
 
-              alert("Piloto eliminado/a correctamente!");
-          } else {
-              alert("Error al eliminar el/la piloto");
-          }
-      }
+            const pilotos = rows[currentRow].getElementsByTagName("TD")[1].innerText.split(', ');
 
-      function CountRows(tableId) {
-          let rowCount = 0;
-          let table = document.getElementById(tableId);
-          let rows = table.getElementsByTagName("tr");
-          for (let i = 0; i < rows.length; i++) {
-              if (rows[i].getElementsByTagName("td").length > 0) {
-                  rowCount++;
-              }
-          }
-          return rowCount;
-      }
+            if (pilotos.length > 0) {
+                const fl = document.getElementById("freelance-list");
+                if (pilotos.length > 0) {
+                    let li1 = document.createElement("li");
+                    li1.innerText = pilotos[0];
+                    li1.id = pilotos[0];
+                    fl.appendChild(li1);
+                    if (pilotos.length > 1) {
+                        let li2 = document.createElement("li");
+                        li2.innerText = pilotos[1];
+                        li2.id = pilotos[1];
+                        fl.appendChild(li2);
+                    }
+                }
+            }
 
-      function sortTable() {
-          let table, rows, switching, i, shouldSwitch;
-          table = document.getElementById("driver-table");
-          switching = true;
-          // Se recorre el bucle hasta que todos los elementos esten ordenados
-          while (switching) {
-              switching = false;
-              rows = table.rows;
-              // Se deben recorrer todas las filas salvo la primera, que es la cabecera
-              for (i = 1; i < (rows.length - 1); i++) {
-                  // start by saying there should be no switching:
-                  shouldSwitch = false;
-                  // Se compara la puntuacion de una fila con la de la siguiente fila
-                  let xchildren = rows[i].getElementsByTagName("TD")[1].childNodes;
-                  let ychildren = rows[i + 1].getElementsByTagName("TD")[1].childNodes;
-                  let x = parseInt(xchildren[0]["score"].value, 10);
-                  let y = parseInt(ychildren[0]["score"].value, 10);
-                  // Si la segunda es mayor que la primera, deben intercambiarse
-                  if (x < y) {
-                      // Rompemos el bucle para intercambiarlos
-                      shouldSwitch = true;
-                      break;
-                  }
-              }
-              if (shouldSwitch) {
-                  // Notificamos que se ha realizado el cambio
-                  rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                  switching = true;
-              }
-          }
-      }
+            if (foundIt) {
+                table.deleteRow(currentRow);
+
+                let formData = new FormData();
+                formData.append("name", name);
+                formData.append("form", "remove");
+
+                let request = new XMLHttpRequest();
+                request.open("POST", "/");
+                request.send(formData);
+
+                if (CountRows("team-table") < 1) {
+                    let banner = document.createElement("p");
+                    banner.id = "no-teams-banner";
+                    banner.innerText = "No se han encontrado equipos en la base de datos";
+
+                    document.getElementById("team-table").remove();
+                    document.getElementById("table-container").appendChild(banner);
+                }
+
+                alert("Piloto eliminado/a correctamente!");
+            } else {
+                alert("Error al eliminar el/la piloto");
+            }
+        }
+
+        function CountRows(tableId) {
+            let rowCount = 0;
+            let table = document.getElementById(tableId);
+            let rows = table.getElementsByTagName("tr");
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].getElementsByTagName("td").length > 0) {
+                    rowCount++;
+                }
+            }
+            return rowCount;
+        }
+
+        function RemoveFromList(element, l) {
+            const elementos = document.getElementById("freelance-list").getElementsByTagName("LI");
+            for (let i = 0; i < elementos.length; i++) {
+                if (elementos[i].id === element) {
+                    elementos[i].remove();
+                    return;
+                }
+            }
+        }
     </script>
 </body>
 </html>

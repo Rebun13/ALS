@@ -16,6 +16,13 @@ def search_driver_name(driver_id, drivers):
     return None
 
 
+def search_driver_id(driver_name, drivers):
+    for d in drivers:
+        if d.name == driver_name:
+            return d.id
+    return None
+
+
 class TeamHandler(webapp2.RequestHandler):
     def get(self):
         user = users.get_current_user()
@@ -62,8 +69,18 @@ class TeamHandler(webapp2.RequestHandler):
         piloto2 = self.request.get('driver2', 'ERROR')
 
         if post_type == "insert" and nombre:
-            # Store the new driver
-            team = Team(name=nombre)
+            team = Team()
+            team.name = nombre
+            if piloto1 != "" or piloto2 != "":
+                drivers = Driver.query().fetch()
+                if piloto1 != "":
+                    id1 = search_driver_id(piloto1, drivers)
+                    if id1:
+                        team.driver1 = id1
+                if piloto2 != "":
+                    id2 = search_driver_id(piloto2, drivers)
+                    if id2:
+                        team.driver2 = id2
             team.put()
 
         elif post_type == "modify" and nombre:
@@ -78,6 +95,14 @@ class TeamHandler(webapp2.RequestHandler):
         elif post_type == "remove" and nombre:
             team = Team.query(Team.name == nombre).fetch()[0]
             team.delete()
+
+        elif post_type == "freelance" and nombre:
+            team = Team.query(Team.name == nombre).fetch()[0]
+            if piloto1 == "":
+                team.driver2 = ""
+            elif piloto2 == "":
+                team.driver1 = ""
+            team.put()
 
         else:
             pass
