@@ -1,0 +1,3 @@
+- Funcionalidad Calendario sin hacer
+- Al crear un nuevo equipo, si se actualiza sin recargar la pagina, se producen errores
+- Al eliminar un piloto, se deberia eliminar su dorsal del equipo en el que estaba

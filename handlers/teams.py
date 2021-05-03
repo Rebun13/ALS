@@ -94,8 +94,9 @@ class TeamHandler(webapp2.RequestHandler):
             team.put()
 
         elif post_type == "remove" and nombre:
-            team = Team.query(Team.name == nombre).fetch()[0]
-            team.delete()
+            team = Team.query(Team.name == nombre).fetch(1)[0]
+            print(team)
+            team.key.delete()
 
         elif post_type == "freelance" and nombre:
             teamlist = Team.query(Team.name == nombre).fetch(1)

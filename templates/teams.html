@@ -166,7 +166,7 @@
             if (tabla === null) {
                 tabla = document.createElement("Table");
                 tabla.id = "team-table";
-                tabla.innerHTML = '<tr><th>Nombre</th><th>Pilotos</th><th></th><th></th></tr>';
+                tabla.innerHTML = '<tr><th>Equipo</th><th>Pilotos</th><th></th><th></th></tr>';
                 emptyTable = true;
             }
 
@@ -384,35 +384,35 @@
 
             for (let i = 1; i < (rows.length); i++) {
                 currentRow = i;
-                if (parseInt(rows[i].getElementsByTagName("TD")[0].innerText) === name) {
+                console.log((rows[i].id) + " = " + name.id);
+                if (rows[i].id === name.id) {
                     foundIt = true;
                     break;
                 }
             }
 
-            const pilotos = rows[currentRow].getElementsByTagName("TD")[1].innerText.split(', ');
-
-            if (pilotos.length > 0) {
-                const fl = document.getElementById("freelance-list");
+            if (foundIt) {
+                const pilotos = rows[currentRow].getElementsByTagName("TD")[1].innerText.split(' y ');
                 if (pilotos.length > 0) {
-                    let li1 = document.createElement("li");
-                    li1.innerText = pilotos[0];
-                    li1.id = pilotos[0];
-                    fl.appendChild(li1);
-                    if (pilotos.length > 1) {
-                        let li2 = document.createElement("li");
-                        li2.innerText = pilotos[1];
-                        li2.id = pilotos[1];
-                        fl.appendChild(li2);
+                    const fl = document.getElementById("freelance-list");
+                    if (pilotos.length > 0) {
+                        let li1 = document.createElement("li");
+                        li1.innerText = pilotos[0];
+                        li1.id = pilotos[0];
+                        fl.appendChild(li1);
+                        if (pilotos.length > 1) {
+                            let li2 = document.createElement("li");
+                            li2.innerText = pilotos[1];
+                            li2.id = pilotos[1];
+                            fl.appendChild(li2);
+                        }
                     }
                 }
-            }
 
-            if (foundIt) {
                 table.deleteRow(currentRow);
 
                 let formData = new FormData();
-                formData.append("name", name);
+                formData.append("name", name.id);
                 formData.append("form", "remove");
 
                 let request = new XMLHttpRequest();

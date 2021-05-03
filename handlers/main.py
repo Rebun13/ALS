@@ -60,7 +60,7 @@ class MainHandler(webapp2.RequestHandler):
         elif post_type == "remove" and id_piloto:
             id_piloto = int(id_piloto)
             driver = Driver.query(Driver.id == id_piloto).fetch()[0]
-            driver.delete()
+            driver.key.delete()
 
         else:
             pass
