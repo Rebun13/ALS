@@ -86,10 +86,11 @@ class TeamHandler(webapp2.RequestHandler):
         elif post_type == "modify" and nombre:
             team = Team.query(Team.name == nombre).fetch()[0]
             team.name = nombre
+            drivers = Driver.query().fetch()
             if piloto1:
-                team.driver1 = int(piloto1)
+                team.driver1 = int(search_driver_id(piloto1, drivers))
             if piloto2:
-                team.driver2 = int(piloto2)
+                team.driver2 = int(search_driver_id(piloto2, drivers))
             team.put()
 
         elif post_type == "remove" and nombre:

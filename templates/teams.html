@@ -107,7 +107,7 @@
             {% if freelance|length > 0 %}
             <ul id="freelance-list">
                 {% for d in freelance %}
-                <li id="{{ d.id }}">{{ d.name }} ({{ d.id }})</li>
+                <li id="{{ d.name }}">{{ d.name }}</li>
                 {% endfor %}
             </ul>
             {% else %}
@@ -201,7 +201,7 @@
             } else if (piloto1 !== "" && piloto2 !== "") {
                 str_pilotos = piloto1 + " y " + piloto2;
             }
-            console.log(str_pilotos);
+
             fila.innerHTML =
                 '<td id="' + nombre + '">' + nombre + '</td>\
                 <td>' + str_pilotos + '</td>\
@@ -236,37 +236,39 @@
             document.getElementById("insert-team-button").style.display = "none";
             //console.log(nombre.id);
             const fila = document.getElementById(nombre.id);
-            const pilotos = fila.getElementsByTagName("TD")[1].innerText.split(' y ')
-            const piloto1 = pilotos[0];
-            const piloto2 = pilotos[1];
-            console.log(piloto1);
-            console.log(piloto2);
+            console.log(fila);
+            const pilotos = fila.getElementsByTagName("TD")[1].innerText.split(' y ');
+            let piloto1, piloto2 = "";
+            if(pilotos.length > 0)
+                piloto1 = pilotos[0];
+            if(pilotos.length > 1)
+                piloto2 = pilotos[1];
             document.forms["team-form"]["name-input"].value = fila.getElementsByTagName("TD")[0].innerText;
 
             const sel1 = document.getElementById("driver1-select");
             const sel2 = document.getElementById("driver2-select");
             if (piloto1 !== "") {
                 const d1 = document.createElement("option");
-                d1.value = "current";
+                d1.value = piloto1;
                 d1.innerText = piloto1;
                 d1.selected = true;
                 sel1.disabled = true;
                 sel1.append(d1);
                 const botonFL1 = document.getElementById("driver1-freelance-button");
-                botonFL1.onclick = function() {makeDriverFreelance(piloto1, 1, nombre)};
-                botonFL1.style.display = "inline";
+                botonFL1.onclick = function() {makeDriverFreelance(piloto1, 1, nombre.id)};
+                botonFL1.style.display = "block";
             }
 
             if (piloto2 !== "") {
                 const d2 = document.createElement("option");
-                d2.value = "current";
+                d2.value = piloto2;
                 d2.innerText = piloto2;
                 d2.selected = true;
                 sel2.disabled = true;
                 sel2.append(d2);
                 const botonFL2 = document.getElementById("driver2-freelance-button");
-                botonFL2.onclick = function() {makeDriverFreelance(piloto2, 2, nombre)};
-                botonFL2.style.display = "inline";
+                botonFL2.onclick = function() {makeDriverFreelance(piloto2, 2, nombre.id)};
+                botonFL2.style.display = "block";
             }
 
             fila.remove();
@@ -289,6 +291,8 @@
                         document.getElementById("driver1-freelance-button").style.display = "none";
                     }
                 }
+                sel.disabled = false;
+                document.getElementById("driver1-freelance-button").dissabled = true;
             } else {
                 formData.append("driver2", piloto);
 
@@ -300,6 +304,8 @@
                         document.getElementById("driver2-freelance-button").style.display = "none";
                     }
                 }
+                sel.disabled = false;
+                document.getElementById("driver2-freelance-button").dissabled = true;
             }
             formData.append("name", equipo);
             formData.append("form", "freelance");
@@ -312,6 +318,7 @@
         function update() {
             const tabla = document.getElementById("team-table");
             const fila = document.createElement("tr");
+            const flList = document.getElementById("freelance-list").getElementsByTagName("li");
 
             let formData = new FormData();
 
@@ -326,22 +333,39 @@
                 str_pilotos = piloto1 + " y " + piloto2;
                 formData.append("driver1", piloto1);
                 formData.append("driver2", piloto2);
+                for(let i = 0; i < flList.length; i++) {
+                    if(flList[i].innerText === piloto1 || flList[i].innerText === piloto2 ) {
+                        flList[i].remove();
+                    }
+                }
             } else if (piloto1 === "") {
                 str_pilotos = piloto2;
                 formData.append("driver2", piloto2);
+                for(let i = 0; i < flList.length; i++) {
+                    if(flList[i].innerText === piloto2 ) {
+                        flList[i].remove();
+                    }
+                }
             } else if (piloto2 === "") {
                 str_pilotos = piloto1;
                 formData.append("driver1", piloto1);
+                for(let i = 0; i < flList.length; i++) {
+                    if(flList[i].innerText === piloto1) {
+                        flList[i].remove();
+                    }
+                }
             }
 
+            fila.id = nombre;
             fila.innerHTML =
-                '<td id="' + nombre + '">' + nombre + '</td>\
+                '<td>' + nombre + '</td>\
                 <td>' + str_pilotos + '</td>\
                 <td><button class="update-button" onClick="updateTeamForm(' + nombre + ')" type="button">Actualizar</button></td>\
                 <td><button class="remove-button" onClick="remove(' + nombre + ')" type="button">Eliminar</button></td>'
             ;
 
             tabla.appendChild(fila);
+            document.getElementById("team-form-container").style.display = "none";
 
             formData.append("form", "modify");
 
