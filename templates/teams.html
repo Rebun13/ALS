@@ -86,9 +86,9 @@
                     {% if t.driver1 and t.driver2 %}
                     <td>{{ t.driver1 }} y {{ t.driver2 }}</td>
                     {% elif t.driver1 %}
-                    <td>t.driver1</td>
+                    <td>{{ t.driver1 }}</td>
                     {% elif t.driver2 %}
-                    <td>t.driver2</td>
+                    <td>{{ t.driver2 }}</td>
                     {% else %}
                     <td>No tiene pilotos</td>
                     {% endif %}
