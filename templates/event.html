@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Carreras</title>
     <style>
         nav {
             height: 50px;
@@ -10,8 +9,6 @@
             background: dimgray;
             color: black;
             font-size: 20px;
-            padding-left: 50px;
-            padding-right: 50px;
             font-family: Arial,serif;
             border-bottom: chartreuse 1px solid;
         }
@@ -29,24 +26,15 @@
             color: chartreuse;
         }
         #nav-container {
+            margin: auto;
             width: 60%;
+        }
+        #nav-container div{
+            display: inline;
         }
         #main-container {
             width: 60%;
             margin: auto;
-        }
-        #table-container {
-            margin: auto;
-        }
-        #header-logo {
-            height: 15px;
-            width: 15px;
-        }
-        .update-button {
-            background: chartreuse;
-            padding: 8px;
-            border-radius: 6px;
-            border-style: none;
         }
         .remove-button {
             background: orangered;
@@ -60,15 +48,27 @@
             padding-left: 10px;
             padding-bottom: 10px;
         }
+        .info-container, .image-container {
+            display: inline-block;
+            margin: auto;
+            width: 40%;
+        }
 
     </style>
 </head>
 <body>
     <nav>
         <div id="nav-container">
-            <a href="/">Pilotos</a>
-            <a href="/event">Calendario</a>
-            <a href="/teams">Equipos</a>
+            <div id="nav-buttons">
+                <a href="/">Pilotos</a>
+                <a href="/event">Calendario</a>
+                <a href="/teams">Equipos</a>
+            </div>
+            <div id="nav-login">
+                {% if username %}
+                <a href="{{ access_link }}">{{ username }}</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
     <div id="main-container">
@@ -76,18 +76,28 @@
         <div id="events-container">
             {% for e in events %}
             <div id="{{e.name}}}-container" class="event-box">
-                <h3 class="event-name">{{ e.name }}</h3>
-                <p class="event-name">País: {{ e.country }}</p>
-                <p class="event-date">Fecha: {{ e.date }}</p>
-                <button type="submit" class="remove-button" id="{{ e.name }}-remove" onclick="removeEvent('{{ e.name }}')">Eliminar</button>
+                <div class="info-container">
+                    <h3 class="event-name">{{ e.name }}</h3>
+                    <p class="event-name">País: {{ e.country }}</p>
+                    <p class="event-date">Fecha: {{ e.date }}</p>
+                    {% if is_admin %}
+                    <button type="submit" class="remove-button" id="{{ e.name }}-remove" onclick="removeEvent('{{ e.name }}')">Eliminar</button>
+                    {% endif %}
+                </div>
+                <div class="image-container">
+                    {% if e.image %}
+                    <img src="data:image/png;base64,{{ e.image.encode('base64') }}" alt="imagen">
+                    {% endif %}
+                </div>
             </div>
             {% else %}
             <p id="no-events-banner">No hay eventos en el calendario</p>
             {% endfor %}
         </div>
+        {% if is_admin %}
         <button id="insert-event-button" onclick="insertEventForm()">Insertar nuevo evento</button>
         <div id="form-container" style="display: none;">
-            <form id="event-form" action="/event" method="post">
+            <form id="event-form" action="/event" method="post" enctype="multipart/form-data">
                 <label for="event-name-input">Nombre del evento: </label>
                 <input type="text" id="event-name-input" name="event-name-input" required/>
 
@@ -97,9 +107,13 @@
                 <label for="event-date-input">Fecha del evento: </label>
                 <input type="date" id="event-date-input" name="event-date-input" required/>
 
+                <label for="event-image-input">Imagen del evento: </label>
+                <input type="file" id="event-image-input" name="event-image-input"/>
+
                 <button type="submit">Insertar</button>
             </form>
         </div>
+        {% endif %}
     </div>
 
     <script>
@@ -116,6 +130,9 @@
             let request = new XMLHttpRequest();
             request.open("POST", "/event");
             request.send(formData);
+
+            if(alert("Evento eliminado correctamente")){}
+            else setTimeout(function(){location.reload()}, 500);
         }
     </script>
 
