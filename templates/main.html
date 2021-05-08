@@ -29,7 +29,11 @@
             color: chartreuse;
         }
         #nav-container {
+            margin: auto;
             width: 60%;
+        }
+        #nav-container div{
+            display: inline;
         }
         #main-container {
             width: 60%;
@@ -37,10 +41,6 @@
         }
         #table-container {
             margin: auto;
-        }
-        #header-logo {
-            height: 15px;
-            width: 15px;
         }
         .update-button {
             background: chartreuse;
@@ -54,15 +54,29 @@
             border-radius: 6px;
             border-style: none;
         }
+        table {
+            width: 100%;
+            text-align: left;
+        }
+        th, td {
+          padding: 15px;
+        }
 
     </style>
 </head>
 <body>
     <nav>
         <div id="nav-container">
-            <a href="/">Pilotos</a>
-            <a href="/event">Calendario</a>
-            <a href="/teams">Equipos</a>
+            <div id="nav-buttons">
+                <a href="/">Pilotos</a>
+                <a href="/event">Calendario</a>
+                <a href="/teams">Equipos</a>
+            </div>
+            <div id="nav-login">
+                {% if username %}
+                <a href="{{ access_link }}">{{ username }}</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
     <div id="main-container">
@@ -79,10 +93,16 @@
                 {% for d in drivers %}
                 <tr>
                     <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
+                    {% if is_admin %}
                     <td><form class="update-driver-form" id="{{ d.id }}-form"><input id="score" type="number" value="{{ d.score }}"></form></td>
+                    {% else %}
+                    <td>{{ d.score }}</td>
+                    {% endif %}
                     <td class="dorsal" style="display: none">{{ d.id }}</td>
+                    {% if is_admin %}
                     <td><button class="update-button" form="{{ d.id }}-form" onclick="update({{ d.id }})" type="button">Actualizar</button></td>
                     <td><button class="remove-button" form="{{ d.id }}-form" onclick="remove({{ d.id }})" type="button">Eliminar</button></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </table>
@@ -91,8 +111,11 @@
         {% endif %}
       </div>
       <div id="driver-form"></div>
+      {% if is_admin %}
       <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
+      {% endif %}
     </div>
+    {% if is_admin %}
     <script>
       function insertDriverForm() {
           const contenedor = document.getElementById("driver-form");
@@ -310,5 +333,6 @@
           }
       }
   </script>
+{% endif %}
 </body>
 </html>

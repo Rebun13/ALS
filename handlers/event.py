@@ -31,7 +31,7 @@ class EventHandler(webapp2.RequestHandler):
             username = "login"
             access_link = users.create_login_url("/event")
             is_admin = False
-        print(username)
+
         events = Event.query().order(Event.date)
         susts = {
             "events": events,
