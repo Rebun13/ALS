@@ -61,6 +61,12 @@
         th, td {
           padding: 15px;
         }
+        #form-container {
+            display: none;
+        }
+        input {
+            display: block;
+        }
 
     </style>
 </head>
@@ -94,7 +100,7 @@
                 <tr>
                     <td><p id="{{ d.id }}-id">{{ d.name }}</p></td>
                     {% if is_admin %}
-                    <td><form class="update-driver-form" id="{{ d.id }}-form"><input id="score" type="number" value="{{ d.score }}"></form></td>
+                    <td><form class="update-driver-form" id="{{ d.id }}-form"><input id="score" type="number" value="{{ d.score }}"/></form></td>
                     {% else %}
                     <td>{{ d.score }}</td>
                     {% endif %}
@@ -110,13 +116,27 @@
             <p id="no-drivers-banner">No se han encontrado pilotos en la base de datos</p>
         {% endif %}
       </div>
-      <div id="driver-form"></div>
       {% if is_admin %}
+      <div id="form-container" >
+          <form id="driver-form" onsubmit="checkFormat()">
+              <label for="name-input">Nombre del piloto: </label>
+              <input type="text" id="name-input" name="name">
+
+              <label for="id-input">Dorsal: </label>
+              <input type="number" id="id-input" name="id">
+
+              <label for="score-input">Puntos: </label>
+              <input type="number" id="score-input" name="score">
+
+              <input type="submit" name="form">
+          </form>
+      </div>
       <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
       {% endif %}
     </div>
     {% if is_admin %}
     <script>
+        // TODO: crear funcion checkFormat() mencionada en la linea 121
       function insertDriverForm() {
           const contenedor = document.getElementById("driver-form");
           const formulario = document.createElement("form");
@@ -126,7 +146,9 @@
           const nombreLabel = document.createElement("label");
           const numeroLabel = document.createElement("label");
           const puntosLabel = document.createElement("label");
-          const boton = document.createElement("button");
+
+          const formtype = document.createElement("input");
+          const boton = document.createElement("input");
 
           document.getElementById("insert-driver-button").style.display = "none";
 
@@ -138,23 +160,25 @@
           puntosLabel.innerText ="Puntos: ";
 
           nombreInput.type = "text";
-          nombreInput.id = nombreInput.name = "name-input";
+          nombreInput.id = nombreInput.name = "name";
           nombreInput.style.display = "block";
           numeroInput.type = "text";
-          numeroInput.id = numeroInput.name = "number-input";
+          numeroInput.id = numeroInput.name = "id";
           numeroInput.style.display = "block";
           puntosInput.type = "number";
-          puntosInput.id = nombreInput.name = "score-input";
+          puntosInput.id = puntosInput.name = "score";
           puntosInput.style.display = "block";
+          formtype.value = "insert";
+          formtype.name = formtype.id = "form";
+          formtype.type = "hidden";
 
-          boton.type = "button";
-          boton.innerText = "Insertar";
-          boton.onclick = function() {insertDriver()};
+          boton.type = "submit";
+          boton.name = "form";
+          boton.value = "Insertar";
 
           formulario.id = "insert-driver-form";
-          //formulario.onsubmit = "insertDriver()";
-          //formulario.action = "/";
-          //formulario.method = "post";
+          formulario.action = "/";
+          formulario.method = "post";
 
           formulario.appendChild(nombreLabel);
           formulario.appendChild(nombreInput);
@@ -164,72 +188,6 @@
           formulario.appendChild(puntosInput);
           formulario.appendChild(boton);
           contenedor.appendChild(formulario);
-      }
-
-      function insertDriver() {
-          let tabla = document.getElementById("driver-table");
-          let emptyTable = false;
-
-          if(tabla === null) {
-              tabla = document.createElement("Table");
-              tabla.id = "driver-table";
-              tabla.innerHTML = '<tr><th>Piloto</th><th>Puntos</th><th></th><th></th></tr>';
-              emptyTable = true;
-          }
-
-          const nombre = document.getElementById("name-input").value;
-          const numero = document.getElementById("number-input").value;
-          let puntos = document.getElementById("score-input").value;
-          const fila = document.createElement("tr");
-
-          if(nombre === "") {
-              alert("El nombre no puede estar vacio");
-              return false;
-          } else if (!/^[A-Z]\. [a-zA-Z]+$/.test(nombre)) {
-              alert("Formato de nombre incorrecto. Utiliza caracteres alfabéticos.");
-              return false;
-          }
-          if(numero === "") {
-              alert("El dorsal no puede estar vacio");
-              return false;
-          } else if (!/^[1-9][0-9]?/.test(numero)) {
-              alert("Formato de dorsal incorrecto. Utiliza caracteres numéricos.");
-              return false;
-          }
-          if(puntos === "") {
-              puntos = 0;
-          }
-
-          let formData = new FormData();
-          formData.append("name", nombre);
-          formData.append("id", numero);
-          formData.append("score", puntos);
-          formData.append("form", "insert");
-
-          fila.innerHTML =
-                  '<td><p id="' + numero + '-id">' + nombre + '</p></td>\
-                   <td><form id="' + numero + '-form"  class="update-driver-form"><input id="score" type="number" value="' + puntos + '">\</form>\</td>\
-                   <td style="display: none" class="dorsal">' + numero + '</td>\
-                   <td><button form="' + numero + '-form" class="update-button" type="button" onclick="update(' + numero + ')">Actualizar</button></td>\
-                   <td><button form="' + numero + '-remove" class="remove-button" type="button" onclick="remove(' + numero + ')">Eliminar</button></td>'
-          ;
-          tabla.appendChild(fila);
-
-          if (emptyTable) {
-              document.getElementById("no-drivers-banner").remove();
-              document.getElementById("table-container").appendChild(tabla);
-          }
-
-          sortTable();
-
-          document.getElementById("driver-form").innerHTML = "";
-          document.getElementById("insert-driver-button").style.display = "inline-block";
-
-          alert("Piloto insertado/a correctamente!");
-
-          let request = new XMLHttpRequest();
-          request.open("POST", "/", true);
-          request.send(formData);
       }
 
       function update(id) {

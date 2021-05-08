@@ -4,6 +4,7 @@
 Se muestra la clasificacion de pilotos y se podran insertar pilotos nuevos. Tambien es posible modificar y eliminar
 pilotos ya existentes. Todos estos datos son guardados en data.json
 """
+import time
 
 import webapp2
 from webapp2_extras import jinja2
@@ -45,7 +46,7 @@ class MainHandler(webapp2.RequestHandler):
         id_piloto = self.request.get('id', 'ERROR')
         puntos = self.request.get('score', 'ERROR')
 
-        if post_type == "insert" and id_piloto:
+        if post_type == "Insertar" and id_piloto:
             id_piloto = int(id_piloto)
             puntos = int(puntos)
             # Store the new driver
@@ -67,6 +68,9 @@ class MainHandler(webapp2.RequestHandler):
 
         else:
             pass
+
+        time.sleep(.5)
+        self.redirect("/")
 
 
 app = webapp2.WSGIApplication([
