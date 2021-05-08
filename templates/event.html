@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carreras</title>
+    <style>
+        nav {
+            height: 50px;
+            text-align: center;
+            background: dimgray;
+            color: black;
+            font-size: 20px;
+            padding-left: 50px;
+            padding-right: 50px;
+            font-family: Arial,serif;
+            border-bottom: chartreuse 1px solid;
+        }
+        body {
+            background: dimgrey;
+            color: honeydew;
+            font-family: Roboto,sans-serif;
+        }
+        nav a {
+            text-decoration: none;
+            color: honeydew;
+            padding: 20px;
+        }
+        nav a:hover {
+            color: chartreuse;
+        }
+        #nav-container {
+            width: 60%;
+        }
+        #main-container {
+            width: 60%;
+            margin: auto;
+        }
+        #table-container {
+            margin: auto;
+        }
+        #header-logo {
+            height: 15px;
+            width: 15px;
+        }
+        .update-button {
+            background: chartreuse;
+            padding: 8px;
+            border-radius: 6px;
+            border-style: none;
+        }
+        .remove-button {
+            background: orangered;
+            padding: 8px;
+            border-radius: 6px;
+            border-style: none;
+        }
+        .event-box {
+            border: solid chartreuse;
+            margin-bottom: 5px;
+            padding-left: 10px;
+            padding-bottom: 10px;
+        }
+
+    </style>
+</head>
+<body>
+    <nav>
+        <div id="nav-container">
+            <a href="/">Pilotos</a>
+            <a href="/event">Calendario</a>
+            <a href="/teams">Equipos</a>
+        </div>
+    </nav>
+    <div id="main-container">
+        <h1>Eventos en el calendario</h1>
+        <div id="events-container">
+            {% for e in events %}
+            <div id="{{e.name}}}-container" class="event-box">
+                <h3 class="event-name">{{ e.name }}</h3>
+                <p class="event-name">País: {{ e.country }}</p>
+                <p class="event-date">Fecha: {{ e.date }}</p>
+                <button type="submit" class="remove-button" id="{{ e.name }}-remove" onclick="removeEvent('{{ e.name }}')">Eliminar</button>
+            </div>
+            {% else %}
+            <p id="no-events-banner">No hay eventos en el calendario</p>
+            {% endfor %}
+        </div>
+        <button id="insert-event-button" onclick="insertEventForm()">Insertar nuevo evento</button>
+        <div id="form-container" style="display: none;">
+            <form id="event-form" action="/event" method="post">
+                <label for="event-name-input">Nombre del evento: </label>
+                <input type="text" id="event-name-input" name="event-name-input" required/>
+
+                <label for="event-country-input">País del evento: </label>
+                <input type="text" id="event-country-input" name="event-country-input" required/>
+
+                <label for="event-date-input">Fecha del evento: </label>
+                <input type="date" id="event-date-input" name="event-date-input" required/>
+
+                <button type="submit">Insertar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function insertEventForm() {
+            document.getElementById("form-container").style.display = "block"
+            document.getElementById("insert-event-button").style.display = "none"
+        }
+
+        function removeEvent(id) {
+            let formData = new FormData();
+            formData.append("event-name-input", id);
+            formData.append("form", "remove");
+
+            let request = new XMLHttpRequest();
+            request.open("POST", "/event");
+            request.send(formData);
+        }
+    </script>
+
+
+</body>

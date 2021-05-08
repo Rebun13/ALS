@@ -9,8 +9,8 @@ handlers:
   static_files: favicon.ico
   upload: favicon\.ico
 
-- url: /calendar
-  script: handlers.calendar.app
+- url: /event
+  script: handlers.event.app
 
 - url: /teams
   script: handlers.teams.app
