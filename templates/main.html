@@ -118,15 +118,15 @@
       </div>
       {% if is_admin %}
       <div id="form-container" >
-          <form id="driver-form" onsubmit="checkFormat()">
+          <form id="driver-form" method="post" onsubmit="checkFormat()">
               <label for="name-input">Nombre del piloto: </label>
-              <input type="text" id="name-input" name="name">
+              <input type="text" id="name-input" name="name" required>
 
               <label for="id-input">Dorsal: </label>
-              <input type="number" id="id-input" name="id">
+              <input type="number" id="id-input" name="id" required>
 
               <label for="score-input">Puntos: </label>
-              <input type="number" id="score-input" name="score">
+              <input type="number" id="score-input" name="score" required>
 
               <input type="submit" name="form">
           </form>
@@ -136,58 +136,28 @@
     </div>
     {% if is_admin %}
     <script>
-        // TODO: crear funcion checkFormat() mencionada en la linea 121
       function insertDriverForm() {
-          const contenedor = document.getElementById("driver-form");
-          const formulario = document.createElement("form");
-          const nombreInput = document.createElement("input");
-          const numeroInput = document.createElement("input");
-          const puntosInput = document.createElement("input");
-          const nombreLabel = document.createElement("label");
-          const numeroLabel = document.createElement("label");
-          const puntosLabel = document.createElement("label");
-
-          const formtype = document.createElement("input");
-          const boton = document.createElement("input");
-
           document.getElementById("insert-driver-button").style.display = "none";
+          document.getElementById("form-container").style.display = "block";
+      }
 
-          nombreLabel.for = "name-input";
-          nombreLabel.innerText ="Nombre del piloto: ";
-          numeroLabel.for = "number-input";
-          numeroLabel.innerText = "Dorsal: ";
-          puntosLabel.for = "score-input";
-          puntosLabel.innerText ="Puntos: ";
+      function checkFormat() {
+          const nombre = document.getElementById("name-input").value;
 
-          nombreInput.type = "text";
-          nombreInput.id = nombreInput.name = "name";
-          nombreInput.style.display = "block";
-          numeroInput.type = "text";
-          numeroInput.id = numeroInput.name = "id";
-          numeroInput.style.display = "block";
-          puntosInput.type = "number";
-          puntosInput.id = puntosInput.name = "score";
-          puntosInput.style.display = "block";
-          formtype.value = "insert";
-          formtype.name = formtype.id = "form";
-          formtype.type = "hidden";
+          if (/[a-zA-Z]+\.? [a-zA-Z]/.test(nombre)) {
+              let formData = new FormData();
+              formData.append("name", nombre);
+              formData.append("id", document.getElementById("id-input").value);
+              formData.append("score", document.getElementById("score-input").value);
+              formData.append("form", "insert");
 
-          boton.type = "submit";
-          boton.name = "form";
-          boton.value = "Insertar";
+              let request = new XMLHttpRequest();
+              request.open("POST", "/");
+              request.send(formData);
 
-          formulario.id = "insert-driver-form";
-          formulario.action = "/";
-          formulario.method = "post";
-
-          formulario.appendChild(nombreLabel);
-          formulario.appendChild(nombreInput);
-          formulario.appendChild(numeroLabel);
-          formulario.appendChild(numeroInput);
-          formulario.appendChild(puntosLabel);
-          formulario.appendChild(puntosInput);
-          formulario.appendChild(boton);
-          contenedor.appendChild(formulario);
+              if(alert("Piloto insertado correctamente")){}
+              else setTimeout(function(){location.reload()}, 500);
+          }
       }
 
       function update(id) {
