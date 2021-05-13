@@ -3,47 +3,47 @@
       {
         "id": 44,
         "name": "L. Hamilton",
-        "score": 44
+        "score": 94
       },
       {
         "id": 33,
         "name": "M. Verstappen",
-        "score": 43
+        "score": 80
     },
       {
         "id": 4,
         "name": "L. Norris",
-        "score": 27
+        "score": 41
       },
       {
         "id": 16,
         "name": "C. Leclerc",
-        "score": 20
+        "score": 40
       },
       {
         "id": 77,
         "name": "V. Bottas",
-        "score": 16
+        "score": 47
       },
       {
         "id": 55,
         "name": "C. Sainz",
-        "score": 14
+        "score": 20
       },
       {
         "id": 3,
         "name": "D. Ricciardo",
-        "score": 14
+        "score": 24
       },
       {
         "id": 11,
         "name": "S. Perez",
-        "score": 10
+        "score": 32
       },
       {
         "id": 10,
         "name": "P. Gasly",
-        "score": 6
+        "score": 8
       },
       {
         "id": 18,
@@ -58,7 +58,47 @@
       {
         "id": 31,
         "name": "E. Ocon",
-        "score": 2
+        "score": 10
+      },
+      {
+        "id": 14,
+        "name": "F. Alonso",
+        "score": 5
+      },
+      {
+        "id": 7,
+        "name": "K. Raikkonen",
+        "score": 0
+      },
+      {
+        "id": 99,
+        "name": "A. Giovinazzi",
+        "score": 0
+      },
+      {
+        "id": 5,
+        "name": "S. Vettel",
+        "score": 0
+      },
+      {
+        "id": 63,
+        "name": "G. Russell",
+        "score": 0
+      },
+      {
+        "id": 47,
+        "name": "M. Schumacher",
+        "score": 0
+      },
+      {
+        "id": 6,
+        "name": "N. Latifi",
+        "score": 0
+      },
+      {
+        "id": 9,
+        "name": "N. Mazepin",
+        "score": 0
       },
       {
         "id": 27,
@@ -89,48 +129,67 @@
       },
       {
         "name": "Aston Martin",
-        "drivers": [18]
+        "drivers": [18, 5]
+      },
+      {
+        "name": "Williams",
+        "drivers": [63, 6]
+      },
+      {
+        "name": "Hass F1 Team",
+        "drivers": [47, 9]
+      },
+      {
+        "name": "Alfa Romeo Racing",
+        "drivers": [7, 99]
       },
       {
         "name": "Alpine",
-        "drivers": [31]
+        "drivers": [31, 14]
       }
     ],
-    "calendar": [
+    "events": [
       {
         "name": "Gulf Air Bahrain GP",
         "country": "Bahrain",
-        "date": "2021-03-28"
+        "date": "2021-03-28",
+        "image": {}
       },
       {
         "name": "Emilia Romagna GP",
         "country": "Italy",
-        "date": "2021-04-16"
+        "date": "2021-04-16",
+        "image": {}
       },
       {
         "name": "Aramco GP",
         "country": "Spain",
-        "date": "2021-05-09"
+        "date": "2021-05-09",
+        "image": {}
       },
       {
         "name": "Monaco GP",
         "country": "Monaco",
-        "date": "2021-05-23"
+        "date": "2021-05-23",
+        "image": {}
       },
       {
         "name": "Azerbaijan GP",
         "country": "Azerbaijan",
-        "date": "2021-06-06"
+        "date": "2021-06-06",
+        "image": {}
       },
       {
         "name": "Heineken GP",
         "country": "Canada",
-        "date": "2021-06-13"
+        "date": "2021-06-13",
+        "image": {}
       },
       {
         "name": "Emirates GP",
         "country": "France",
-        "date": "2021-06-27"
+        "date": "2021-06-27",
+        "image": {}
       }
     ]
 }

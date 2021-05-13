@@ -37,7 +37,7 @@ class TeamHandler(webapp2.RequestHandler):
             is_admin = False
 
         drivers = Driver.query().fetch()
-        teams_raw = Team.query().fetch()
+        teams_raw = Team.query().order(Team.name).fetch()
 
         teams = list(dict())
 

@@ -15,6 +15,9 @@ handlers:
 - url: /teams
   script: handlers.teams.app
 
+- url: /load
+  script: handlers.load.app
+
 - url: .*
   script: handlers.main.app
 
