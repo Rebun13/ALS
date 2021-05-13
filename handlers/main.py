@@ -58,6 +58,7 @@ class MainHandler(webapp2.RequestHandler):
             puntos = int(puntos)
 
             driver = Driver.query(Driver.id == id_piloto).fetch()[0]
+            print(driver)
             driver.score = puntos
             driver.put()
 

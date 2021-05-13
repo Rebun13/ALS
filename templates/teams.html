@@ -6,7 +6,7 @@
     <style>
         nav {
             height: 50px;
-            text-align: left;
+            text-align: center;
             background: dimgray;
             color: black;
             font-size: 20px;
@@ -32,8 +32,14 @@
             width: 60%;
             margin: auto;
         }
+        #nav-container div{
+            display: inline;
+        }
         #main-container {
             width: 60%;
+            margin: auto;
+        }
+        #table-container {
             margin: auto;
         }
         table {
@@ -63,10 +69,16 @@
 <body>
     <nav>
         <div id="nav-container">
-            <!-- <a href="/"><img src="./static/logo.png" id="header-logo" alt="logo"/></a> -->
-            <a href="/">Pilotos</a>
-            <a href="/event">Calendario</a>
-            <a href="/teams">Equipos</a>
+            <div id="nav-buttons">
+                <a href="/">Pilotos</a>
+                <a href="/event">Calendario</a>
+                <a href="/teams">Equipos</a>
+            </div>
+            <div id="nav-login">
+                {% if username %}
+                <a href="{{ access_link }}">{{ username }}</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
     <div id="main-container">
@@ -92,8 +104,10 @@
                     {% else %}
                     <td>No tiene pilotos</td>
                     {% endif %}
+                    {% if is_admin %}
                     <td><button class="update-button" onclick="updateTeamForm({{ t.name }})" type="button">Actualizar</button></td>
                     <td><button class="remove-button" onclick="remove({{ t.name }})" type="button">Eliminar</button></td>
+                    {% endif %}
                 </tr>
                 {% endfor %}
             </table>
@@ -101,7 +115,9 @@
         <p id="no-teams-banner">No se han encontrado equipos</p>
         {% endif %}
         </div>
+        {% if is_admin %}
         <button id="insert-team-button" onclick="insertTeamForm()">Inserta un nuevo equipo</button>
+        {% endif %}
         <div id="freelance-drivers-container">
             <h3>Pilotos sin equipo</h3>
             {% if freelance|length > 0 %}
@@ -114,10 +130,11 @@
             <p id="no-freelance-banner">No hay pilotos sin equipo</p>
             {% endif %}
         </div>
+        {% if is_admin %}
         <div id="team-form-container" style="display: none">
             <form id="team-form">
                 <label for="name-input">Nombre del equipo:</label>
-                <input type="text" id="name-input" name="name-input">
+                <input type="text" id="name-input" name="name-input" required>
 
                 <label for="driver1-select">Nombre de el/la primer/a piloto:</label>
                 <select id="driver1-select">
@@ -149,8 +166,9 @@
                 <button type="button" id="update-button" onclick="update()" disabled>Actualizar</button>
             </form>
         </div>
+        {% endif %}
     </div>
-
+    {% if is_admin %}
     <script>
         function insertTeamForm() {
             document.getElementById("team-form-container").style.display = "block";
@@ -160,20 +178,10 @@
         }
 
         function insertTeam() {
-            let tabla = document.getElementById("team-table");
-            let emptyTable = false;
-
-            if (tabla === null) {
-                tabla = document.createElement("Table");
-                tabla.id = "team-table";
-                tabla.innerHTML = '<tr><th>Equipo</th><th>Pilotos</th><th></th><th></th></tr>';
-                emptyTable = true;
-            }
 
             const nombre = document.getElementById("name-input").value;
             const piloto1 = document.getElementById("driver1-select").value;
             const piloto2 = document.getElementById("driver2-select").value;
-            const fila = document.createElement("tr");
 
             if (nombre === "") {
                 alert("El nombre no puede estar vacio");
@@ -193,40 +201,12 @@
             }
             formData.append("form", "insert");
 
-            let str_pilotos = "";
-            if (piloto1 !== "" && piloto2 === "") {
-                str_pilotos = piloto1;
-            } else if (piloto1 === "" && piloto2 !== "") {
-                str_pilotos = piloto2;
-            } else if (piloto1 !== "" && piloto2 !== "") {
-                str_pilotos = piloto1 + " y " + piloto2;
-            }
-
-            fila.innerHTML =
-                '<td id="' + nombre + '">' + nombre + '</td>\
-                <td>' + str_pilotos + '</td>\
-                <td><button class="update-button" onClick="updateTeamForm(' + nombre + ')" type="button">Actualizar</button></td>\
-                <td><button class="remove-button" onClick="remove(' + nombre + ')" type="button">Eliminar</button></td>'
-            ;
-
-            tabla.appendChild(fila);
-
-            if (emptyTable) {
-                document.getElementById("no-teams-banner").remove();
-                document.getElementById("table-container").appendChild(tabla);
-            }
-
-            document.getElementById("team-form-container").style.display = "none";
-            document.getElementById("insert-button").disabled = true;
-            document.getElementById("insert-team-button").style.display = "inline-block";
-            RemoveFromList(piloto1, document.getElementById("freelance-list"));
-            RemoveFromList(piloto2, document.getElementById("freelance-list"));
-
             let request = new XMLHttpRequest();
             request.open("POST", "/teams", true);
             request.send(formData);
 
-            alert("Equipo insertado correctamente!");
+            if(alert("Equipo insertado correctamente!")){}
+            else setTimeout(function(){location.reload()}, 500);
         }
 
         function updateTeamForm(nombre) {
@@ -234,9 +214,9 @@
             document.getElementById("insert-button").disabled = true;
             document.getElementById("update-button").disabled = false;
             document.getElementById("insert-team-button").style.display = "none";
-            //console.log(nombre.id);
+
             const fila = document.getElementById(nombre.id);
-            console.log(fila);
+
             const pilotos = fila.getElementsByTagName("TD")[1].innerText.split(' y ');
             let piloto1, piloto2 = "";
             if(pilotos.length > 0)
@@ -270,8 +250,6 @@
                 botonFL2.onclick = function() {makeDriverFreelance(piloto2, 2, nombre.id)};
                 botonFL2.style.display = "block";
             }
-
-            fila.remove();
         }
 
         function makeDriverFreelance(piloto, num, equipo) {
@@ -456,5 +434,6 @@
             }
         }
     </script>
+    {% endif %}
 </body>
 </html>

@@ -128,7 +128,7 @@
               <label for="score-input">Puntos: </label>
               <input type="number" id="score-input" name="score" required>
 
-              <input type="submit" name="form">
+              <input type="submit" name="form" value="Insertar">
           </form>
       </div>
       <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
@@ -172,9 +172,8 @@
           request.open("POST", "/");
           request.send(formData);
 
-          sortTable();
-
-          alert("Piloto actualizado/a correctamente!");
+          if(alert("Piloto actualizado correctamente")){}
+          else setTimeout(function(){location.reload()}, 500);
       }
 
       function remove(id) {

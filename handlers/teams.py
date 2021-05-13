@@ -28,10 +28,12 @@ class TeamHandler(webapp2.RequestHandler):
         user = users.get_current_user()
 
         if user:
-            user_name = user.nickname()
+            username = user.nickname()
             is_admin = users.is_current_user_admin()
+            access_link = users.create_logout_url("/teams")
         else:
-            user_name = None
+            username = "login"
+            access_link = users.create_login_url("/teams")
             is_admin = False
 
         drivers = Driver.query().fetch()
@@ -56,7 +58,10 @@ class TeamHandler(webapp2.RequestHandler):
 
         susts = {
             "teams": teams,
-            "freelance": drivers
+            "freelance": drivers,
+            "username": username,
+            "is_admin": is_admin,
+            "access_link": access_link
         }
 
         jinja = jinja2.get_jinja2(app=self.app)
