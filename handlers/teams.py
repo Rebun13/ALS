@@ -69,32 +69,35 @@ class TeamHandler(webapp2.RequestHandler):
 
     def post(self):
         post_type = self.request.get('form', 'ERROR')
+        nombre_old = self.request.get('old-name', 'ERROR')
         nombre = self.request.get('name', 'ERROR')
         piloto1 = self.request.get('driver1', 'ERROR')
         piloto2 = self.request.get('driver2', 'ERROR')
 
         if post_type == "insert" and nombre:
-            team = Team()
-            team.name = nombre
-            if piloto1 != "" or piloto2 != "":
-                drivers = Driver.query().fetch()
-                if piloto1 != "":
-                    id1 = search_driver_id(piloto1, drivers)
-                    if id1:
-                        team.driver1 = id1
-                if piloto2 != "":
-                    id2 = search_driver_id(piloto2, drivers)
-                    if id2:
-                        team.driver2 = id2
-            team.put()
+            team = Team.query(Team.name == nombre_old).fetch()[0]
+            if not team:
+                team = Team()
+                team.name = nombre
+                if piloto1 != "" or piloto2 != "":
+                    drivers = Driver.query().fetch()
+                    if piloto1 != "":
+                        id1 = search_driver_id(piloto1, drivers)
+                        if id1:
+                            team.driver1 = id1
+                    if piloto2 != "":
+                        id2 = search_driver_id(piloto2, drivers)
+                        if id2:
+                            team.driver2 = id2
+                team.put()
 
         elif post_type == "modify" and nombre:
-            team = Team.query(Team.name == nombre).fetch()[0]
+            team = Team.query(Team.name == nombre_old).fetch()[0]
             team.name = nombre
             drivers = Driver.query().fetch()
-            if piloto1:
+            if piloto1 != 'ERROR':
                 team.driver1 = int(search_driver_id(piloto1, drivers))
-            if piloto2:
+            if piloto2 != 'ERROR':
                 team.driver2 = int(search_driver_id(piloto2, drivers))
             team.put()
 
@@ -106,10 +109,10 @@ class TeamHandler(webapp2.RequestHandler):
             teamlist = Team.query(Team.name == nombre).fetch(1)
             length = len(teamlist)
             team = teamlist[length - 1]
-            if piloto1 == "":
-                team.driver2 = ""
-            elif piloto2 == "":
-                team.driver1 = ""
+            if piloto1 == 'ERROR':
+                team.driver2 = None
+            elif piloto2 == 'ERROR':
+                team.driver1 = None
             team.put()
 
         else:
