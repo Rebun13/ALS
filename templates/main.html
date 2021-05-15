@@ -49,7 +49,7 @@
             border-style: none;
         }
         .remove-button {
-            background: orangered;
+            background: #FA4054;
             padding: 8px;
             border-radius: 6px;
             border-style: none;
@@ -115,50 +115,64 @@
         {% else %}
             <p id="no-drivers-banner">No se han encontrado pilotos en la base de datos</p>
         {% endif %}
-      </div>
-      {% if is_admin %}
-      <div id="form-container" >
-          <form id="driver-form" method="post" onsubmit="checkFormat()">
-              <label for="name-input">Nombre del piloto: </label>
-              <input type="text" id="name-input" name="name" required>
+        </div>
+        {% if is_admin %}
+        <div id="form-container" >
+              <form id="driver-form" method="post" onsubmit="checkFormat()">
+                  <label for="name-input">Nombre del piloto: </label>
+                  <input type="text" id="name-input" name="name" required>
 
-              <label for="id-input">Dorsal: </label>
-              <input type="number" id="id-input" name="id" required>
+                  <label for="id-input">Dorsal: </label>
+                  <input type="number" id="id-input" name="id" required>
 
-              <label for="score-input">Puntos: </label>
-              <input type="number" id="score-input" name="score" required>
+                  <label for="score-input">Puntos: </label>
+                  <input type="number" id="score-input" name="score" required>
 
-              <input type="submit" name="form" value="Insertar">
-          </form>
-      </div>
-      <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
-      {% endif %}
+                  <input type="submit" name="form" value="Insertar">
+            </form>
+        </div>
+        <button id="insert-driver-button" onclick="insertDriverForm()">Inserta un nuevo piloto</button>
+        {% endif %}
     </div>
     {% if is_admin %}
     <script>
-      function insertDriverForm() {
-          document.getElementById("insert-driver-button").style.display = "none";
-          document.getElementById("form-container").style.display = "block";
-      }
+        function insertDriverForm() {
+            document.getElementById("insert-driver-button").style.display = "none";
+            document.getElementById("form-container").style.display = "block";
+        }
 
-      function checkFormat() {
-          const nombre = document.getElementById("name-input").value;
+        function checkFormat() {
+            const nombre = document.getElementById("name-input").value;
+            const dorsal = document.getElementById("id-input").value;
+            const puntos = document.getElementById("score-input").value;
 
-          if (/[a-zA-Z]+\.? [a-zA-Z]/.test(nombre)) {
-              let formData = new FormData();
-              formData.append("name", nombre);
-              formData.append("id", document.getElementById("id-input").value);
-              formData.append("score", document.getElementById("score-input").value);
-              formData.append("form", "insert");
+            if (/^[a-zA-Z]+\.? [a-zA-Z]$/.test(nombre)) {
+                if (dorsal > 0) {
+                    if (puntos >= 0) {
+                        let formData = new FormData();
+                        formData.append("name", nombre);
+                        formData.append("id", document.getElementById("id-input").value);
+                        formData.append("score", document.getElementById("score-input").value);
+                        formData.append("form", "insert");
 
-              let request = new XMLHttpRequest();
-              request.open("POST", "/");
-              request.send(formData);
+                        let request = new XMLHttpRequest();
+                        request.open("POST", "/");
+                        request.send(formData);
 
-              if(alert("Piloto insertado correctamente")){}
-              else setTimeout(function(){location.reload()}, 500);
-          }
-      }
+                        if (alert("Piloto insertado correctamente")) {
+                        } else setTimeout(function () {
+                            location.reload()
+                        }, 500);
+                    } else {
+                        alert("La puntuación no puede ser negativa");
+                    }
+                } else {
+                    alert("El dorsal no debe ser mayor que 0");
+                }
+            } else {
+                alert("El nombre del piloto solo debe contener caracteres alfabéticos.");
+            }
+        }
 
       function update(id) {
           const puntos =  document.getElementById(id + "-form")["score"].value;
@@ -226,38 +240,6 @@
               }
           }
           return rowCount;
-      }
-
-      function sortTable() {
-          let table, rows, switching, i, shouldSwitch;
-          table = document.getElementById("driver-table");
-          switching = true;
-          // Se recorre el bucle hasta que todos los elementos esten ordenados
-          while (switching) {
-              switching = false;
-              rows = table.rows;
-              // Se deben recorrer todas las filas salvo la primera, que es la cabecera
-              for (i = 1; i < (rows.length - 1); i++) {
-                  // start by saying there should be no switching:
-                  shouldSwitch = false;
-                  // Se compara la puntuacion de una fila con la de la siguiente fila
-                  let xchildren = rows[i].getElementsByTagName("TD")[1].childNodes;
-                  let ychildren = rows[i + 1].getElementsByTagName("TD")[1].childNodes;
-                  let x = parseInt(xchildren[0]["score"].value, 10);
-                  let y = parseInt(ychildren[0]["score"].value, 10);
-                  // Si la segunda es mayor que la primera, deben intercambiarse
-                  if (x < y) {
-                      // Rompemos el bucle para intercambiarlos
-                      shouldSwitch = true;
-                      break;
-                  }
-              }
-              if (shouldSwitch) {
-                  // Notificamos que se ha realizado el cambio
-                  rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                  switching = true;
-              }
-          }
       }
   </script>
 {% endif %}
